@@ -41,7 +41,7 @@
 5. **只能拖曳的無障礙限制**：只用鍵盤或輔助工具的使用者無法完成安裝。這是已確認的產品決定，在此記錄其影響。
 6. **帶有 `runtime-repo` 的 bundle 離線裝不起來**：實測 flatpak 每次安裝這類 bundle 都會去下載 `.flatpakrepo`，即使 runtime 已經裝好也一樣，沒有網路就會失敗。目前的錯誤訊息會請使用者檢查網路連線。
 7. **`--filesystem=xdg-download:ro`**：Flatpak 版多要了「下載」資料夾的唯讀權限，作為拖放時的備援（見 P10）。送審 Flathub 時需要說明理由。
-8. **`--share=network`**：Flatpak 版可以連網，用來向 Flathub 查詢 `.flatpakref` 的權限（見 P4）。送審 Flathub 時需要說明理由。向 Flathub API 查詢的部分只用本機的假伺服器測試過，還沒對真正的 flathub.org 驗證。
+8. **`--share=network`**：Flatpak 版可以連網，用來向 Flathub 查詢 `.flatpakref` 的權限（見 P4），以及下載 `.flatpakref` 的圖示（見「App 的圖示與名稱」）。送審 Flathub 時需要說明理由。向 Flathub API 查詢的部分只用本機的假伺服器測試過，還沒對真正的 flathub.org 驗證。
 
 ## 判斷能否安裝到系統（P9）
 
@@ -124,6 +124,23 @@ bundle 自帶 `runtime-repo` 時，flatpak 會自己加入那個 repository，�
 - 較敏感的權限（執行任何程式、存取所有檔案或個人檔案、所有裝置、密碼、金鑰、修改其他 App 的資料、舊式顯示方式等）排在前面，用橘色的小驚嘆號標示，最後加一句「很多好用的 App 都需要這類權限，只要確定你信任這個 App 就好」。不用紅色，也不擋住安裝。
 
 分類規則在 `src/permissions.cpp`，白話文字在 `src/permissiontext.cpp`。
+
+## App 的圖示與名稱
+
+**`.flatpak`**
+
+1. `flatpak build-bundle` 打包時，如果 App 裡有 AppStream 資料（`files/share/app-info/`），會把 64px（或 128px）的圖示和 AppStream XML 一起放進 bundle 的 metadata，直接用這些就好。
+2. 很多 bundle 沒有這些資料（例如 App 沒有附 AppStream metainfo）。這時改從 bundle 的內容裡，讀出 App 給選單用的檔案：
+   - 名稱與說明：`export/share/applications/<app-id>.desktop` 的 `Name`、`Comment`（含翻譯）。
+   - 圖示：`export/share/icons/hicolor/` 底下，先找 `scalable` 的 SVG（畫成 256px），沒有的話用最大的 PNG。`.desktop` 的 `Icon` 以 App ID 開頭時，就用它的名稱。
+
+   bundle 是從零開始的 OSTree static delta：所有檔案分成幾個 part（預設每個約 32 MB，大多用 xz 壓縮），各自附一串寫出檔案的操作。程式從 commit 的根目錄一路找到需要的檔案，只解壓縮有用到的 part。150 MB、內容無法壓縮的測試 bundle 約要 0.2 秒。程式碼在 `src/bundlecontents.cpp`。
+
+   讀出來的檔案不驗證 checksum，因為只拿來顯示，這些資訊 bundle 本來就可以自己寫在 metadata 裡；真正安裝時 flatpak 會驗證所有內容。解析器用隨機破壞的 bundle 在 AddressSanitizer 下測試過。
+
+**`.flatpakref`**
+
+檔案裡的 `Icon=` 是圖示的網址（Flathub 的 `.flatpakref` 都有）。開啟檔案後在背景下載，下載好之前先顯示通用圖示。只接受 HTTPS，而且主機要和 `Url=` 的 repository 相同，避免開啟檔案時連到其他網站；檔案最大 4 MB，最多等 8 秒。
 
 ## 已經裝過時（P5）
 

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
+#include "fakeserver.h"
 #include "flathubclient.h"
 #include "permissions.h"
 
 #include <QSignalSpy>
 #include <QTcpServer>
-#include <QTcpSocket>
 #include <QTest>
 
 using namespace Qt::StringLiterals;
@@ -30,37 +30,6 @@ const QByteArray kSummary = R"({
     }
   }
 })";
-
-// Answers every request on a local port with one canned HTTP response.
-class FakeServer : public QTcpServer
-{
-public:
-    QByteArray status = "200 OK";
-    QByteArray body;
-    QByteArray requestLine;
-
-    FakeServer()
-    {
-        connect(this, &QTcpServer::newConnection, this, [this] {
-            QTcpSocket *socket = nextPendingConnection();
-            connect(socket, &QTcpSocket::readyRead, socket, [this, socket] {
-                if (requestLine.isEmpty()) {
-                    requestLine = socket->readLine().trimmed();
-                }
-                socket->readAll();
-                socket->write("HTTP/1.1 " + status + "\r\nContent-Type: application/json\r\nContent-Length: " + QByteArray::number(body.size())
-                              + "\r\nConnection: close\r\n\r\n" + body);
-                socket->disconnectFromHost();
-            });
-        });
-        listen(QHostAddress::LocalHost);
-    }
-
-    QUrl base() const
-    {
-        return QUrl(u"http://127.0.0.1:%1/api/v2/"_s.arg(serverPort()));
-    }
-};
 
 QList<Kind> kinds(const QByteArray &metadata)
 {

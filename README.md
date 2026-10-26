@@ -55,6 +55,7 @@ The code, code comments, commit messages and user interface source strings are a
 | File | Purpose |
 |---|---|
 | `src/packagefile.*` | Reads `.flatpak` (a GVariant in OSTree static delta format) and `.flatpakref` (a key file) |
+| `src/bundlecontents.*` | Reads single files, such as the app's icon, out of a `.flatpak` without installing it |
 | `src/hostenvironment.*` | Decides whether system-wide installs are possible: host distribution, polkit authorization |
 | `src/hostcommand.*` | Runs commands on the host |
 | `src/flatpakcli.*` | Builds the arguments for `flatpak` |
@@ -62,6 +63,7 @@ The code, code comments, commit messages and user interface source strings are a
 | `src/permissiontext.*` | Turns permissions and source into plain, translated text |
 | `src/existinginstall.*` | Finds an installed copy and compares it with the one in the file |
 | `src/flathubclient.*` | Asks Flathub's website for a `.flatpakref`'s permissions when its remote isn't set up |
+| `src/icondownloader.*` | Downloads the icon a `.flatpakref` links to |
 | `src/installer.*` | State and actions for the QML interface |
 | `src/filedroparea.*` | Accepts files dragged in from a file manager or browser |
 | `src/qml/` | User interface |

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "packagefile.h"
 
+#include <QColor>
 #include <QFile>
 #include <QTest>
 
@@ -88,6 +89,35 @@ private Q_SLOTS:
         QVERIFY(result.info->icon.isNull());
     }
 
+    void bundleWithoutAppStreamUsesExports()
+    {
+        const auto result = PackageFile::load(fixture("paint.flatpak"), {u"en_US"_s, u"en"_s});
+        QVERIFY(result.info);
+        QCOMPARE(result.info->name, u"Paint"_s);
+        QCOMPARE(result.info->summary, u"Draw pictures"_s);
+        // The SVG is drawn at the size the interface needs.
+        QCOMPARE(result.info->icon.size(), QSize(256, 256));
+        QCOMPARE(result.info->icon.pixelColor(128, 128), QColor(0x33, 0x99, 0xff));
+    }
+
+    void bundleExportsPickPreferredLanguage()
+    {
+        const auto result = PackageFile::load(fixture("paint.flatpak"), {u"zh_TW"_s, u"zh"_s});
+        QVERIFY(result.info);
+        QCOMPARE(result.info->name, u"小畫家"_s);
+        QCOMPARE(result.info->summary, u"畫圖"_s);
+    }
+
+    void bundleExportsPickBiggestPng()
+    {
+        // The 128px icon is a symlink into files/, in another part of the
+        // bundle than the directory listings.
+        const auto result = PackageFile::load(fixture("sketch.flatpak"), {u"en"_s});
+        QVERIFY(result.info);
+        QCOMPARE(result.info->name, u"Sketch"_s);
+        QCOMPARE(result.info->icon.size(), QSize(128, 128));
+    }
+
     void ref()
     {
         const auto result = PackageFile::load(fixture("example.flatpakref"), {});
@@ -102,6 +132,8 @@ private Q_SLOTS:
         QCOMPARE(info.summary, u"Write things down"_s);
         QCOMPARE(info.remoteUrl, u"https://dl.flathub.org/repo/"_s);
         QCOMPARE(info.runtimeRepoUrl, u"https://dl.flathub.org/repo/flathub.flatpakrepo"_s);
+        QCOMPARE(info.iconUrl, u"https://dl.flathub.org/repo/appstream/x86_64/icons/128x128/org.example.Notes.png"_s);
+        QVERIFY(info.icon.isNull());
     }
 
     void refRuntime()

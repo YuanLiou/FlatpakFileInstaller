@@ -1,18 +1,23 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "packagefile.h"
 
+#include "bundlecontents.h"
+
 #include <KCompressionDevice>
 
 #include <QBuffer>
 #include <QCryptographicHash>
 #include <QFile>
 #include <QHash>
+#include <QImageReader>
 #include <QLocale>
 #include <QRegularExpression>
 #include <QXmlStreamReader>
 #include <QtEndian>
 
 #include <glib.h>
+
+#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
@@ -35,6 +40,8 @@ constexpr int kBundleCommitIndex = 4;
 
 constexpr qsizetype kMaxRefFileSize = 1024 * 1024;
 constexpr qint64 kMaxAppdataSize = 4 * 1024 * 1024;
+// Big enough for the largest icon size the interface shows, on a 2x screen.
+constexpr int kIconSize = 256;
 
 bool isValidId(const QString &id)
 {
@@ -135,6 +142,100 @@ void applyAppdata(PackageInfo &info, const QByteArray &gzipped, const QStringLis
     info.summary = PackageFile::localizedValue(summaries, languages);
 }
 
+// Values of `key` and its localized forms ("Name", "Name[zh_TW]", ...) from
+// the [Desktop Entry] group.
+QHash<QString, QString> desktopValues(GKeyFile *keyFile, const QString &key)
+{
+    QHash<QString, QString> values;
+    constexpr auto group = "Desktop Entry";
+    g_auto(GStrv) keys = g_key_file_get_keys(keyFile, group, nullptr, nullptr);
+    for (gchar **it = keys; it && *it; ++it) {
+        const QString name = QString::fromUtf8(*it);
+        QString lang;
+        if (name.startsWith(key + u'[') && name.endsWith(u']')) {
+            lang = normalizedLanguage(name.mid(key.size() + 1).chopped(1));
+        } else if (name != key) {
+            continue;
+        }
+        g_autofree gchar *value = g_key_file_get_string(keyFile, group, *it, nullptr);
+        values.insert(lang, QString::fromUtf8(value).simplified());
+    }
+    return values;
+}
+
+QImage readIcon(const QByteArray &data, const char *format)
+{
+    QBuffer buffer;
+    buffer.setData(data);
+    QImageReader reader(&buffer, format);
+    const QSize size = reader.size();
+    // SVGs are drawn at whatever size is asked for; big PNGs are scaled down.
+    const bool scalable = qstrncmp(format, "svg", 3) == 0;
+    if (size.isValid() && (scalable || size.width() > kIconSize || size.height() > kIconSize)) {
+        reader.setScaledSize(size.scaled(kIconSize, kIconSize, Qt::KeepAspectRatio));
+    }
+    return reader.read();
+}
+
+// The app's icon as exported for menus: a scalable one if there is one
+// (and Qt can draw it), otherwise the biggest PNG.
+QImage exportedIcon(BundleContents &contents, const QString &name)
+{
+    const QString base = u"export/share/icons/hicolor"_s;
+    for (const char *format : {"svg", "svgz"}) {
+        if (const auto data = contents.readFile(u"%1/scalable/apps/%2.%3"_s.arg(base, name, QLatin1StringView(format)))) {
+            if (QImage icon = readIcon(*data, format); !icon.isNull()) {
+                return icon;
+            }
+        }
+    }
+
+    static const QRegularExpression sizeDir(u"^(\\d+)x\\1$"_s);
+    QList<int> sizes;
+    for (const QString &dir : contents.subdirectories(base)) {
+        if (const auto match = sizeDir.match(dir); match.hasMatch()) {
+            sizes.append(match.captured(1).toInt());
+        }
+    }
+    std::sort(sizes.begin(), sizes.end(), std::greater<>());
+    for (const int size : std::as_const(sizes)) {
+        if (const auto data = contents.readFile(u"%1/%2x%2/apps/%3.png"_s.arg(base).arg(size).arg(name))) {
+            if (QImage icon = readIcon(*data, "png"); !icon.isNull()) {
+                return icon;
+            }
+        }
+    }
+    return {};
+}
+
+// Bundles built without AppStream data carry no icon or name of their own.
+// The desktop file and icons the app exports for menus are still inside.
+void applyExports(PackageInfo &info, GVariant *delta, const QStringList &languages)
+{
+    BundleContents contents(delta);
+    QString iconName = info.id;
+    if (const auto desktop = contents.readFile(u"export/share/applications/%1.desktop"_s.arg(info.id))) {
+        g_autoptr(GKeyFile) keyFile = g_key_file_new();
+        if (g_key_file_load_from_data(keyFile, desktop->constData(), desktop->size(), G_KEY_FILE_KEEP_TRANSLATIONS, nullptr)) {
+            if (info.name.isEmpty()) {
+                info.name = PackageFile::localizedValue(desktopValues(keyFile, u"Name"_s), languages);
+            }
+            if (info.summary.isEmpty()) {
+                info.summary = PackageFile::localizedValue(desktopValues(keyFile, u"Comment"_s), languages);
+            }
+            // Exported icons are named after the app ID, but may add to it
+            // (org.example.App.Devel).
+            const QString icon = desktopValues(keyFile, u"Icon"_s).value(QString());
+            if (icon.startsWith(info.id) && !icon.contains(u'/')) {
+                iconName = icon;
+            }
+        }
+    }
+    if (info.icon.isNull()) {
+        info.icon = exportedIcon(contents, iconName);
+    }
+}
+
 PackageFile::Result parseBundleBytes(GBytes *bytes, const QStringList &languages)
 {
     g_autoptr(GVariant) delta = g_variant_ref_sink(g_variant_new_from_bytes(G_VARIANT_TYPE(kBundleType), bytes, FALSE));
@@ -185,6 +286,10 @@ PackageFile::Result parseBundleBytes(GBytes *bytes, const QStringList &languages
                 break;
             }
         }
+    }
+
+    if (info.kind == PackageInfo::Kind::App && (info.icon.isNull() || info.name.isEmpty())) {
+        applyExports(info, delta, languages);
     }
 
     g_autoptr(GVariant) commit = g_variant_get_child_value(delta, kBundleCommitIndex);
@@ -271,6 +376,7 @@ Result parseRef(const QByteArray &data)
     info.kind = g_key_file_get_boolean(keyFile, group, "IsRuntime", nullptr) ? PackageInfo::Kind::Runtime : PackageInfo::Kind::App;
     info.name = get("Title");
     info.summary = get("Comment");
+    info.iconUrl = get("Icon");
     info.runtimeRepoUrl = get("RuntimeRepo");
     return {.info = std::move(info), .error = Error::None};
 }
