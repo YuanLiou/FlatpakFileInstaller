@@ -4,6 +4,7 @@
 #include <KCompressionDevice>
 
 #include <QBuffer>
+#include <QCryptographicHash>
 #include <QFile>
 #include <QHash>
 #include <QLocale>
@@ -187,6 +188,12 @@ PackageFile::Result parseBundleBytes(GBytes *bytes, const QStringList &languages
     }
 
     g_autoptr(GVariant) commit = g_variant_get_child_value(delta, kBundleCommitIndex);
+    // An OSTree commit's ID is the SHA-256 of its serialized GVariant.
+    if (g_autoptr(GBytes) commitBytes = g_variant_get_data_as_bytes(commit)) {
+        gsize size = 0;
+        const auto *data = static_cast<const char *>(g_bytes_get_data(commitBytes, &size));
+        info.commit = QString::fromLatin1(QCryptographicHash::hash(QByteArrayView(data, static_cast<qsizetype>(size)), QCryptographicHash::Sha256).toHex());
+    }
     g_autoptr(GVariant) commitMetadata = g_variant_get_child_value(commit, 0);
     guint64 installedSize = 0;
     if (g_variant_lookup(commitMetadata, "xa.installed-size", "t", &installedSize)) {

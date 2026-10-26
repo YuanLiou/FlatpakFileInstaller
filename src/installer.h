@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 #pragma once
 
+#include "existinginstall.h"
 #include "hostenvironment.h"
 #include "packageinfo.h"
 
@@ -12,6 +13,7 @@
 #include <QtQmlIntegration>
 
 #include <functional>
+#include <optional>
 
 class FlathubClient;
 class QQmlEngine;
@@ -24,6 +26,9 @@ class Installer : public QObject
     Q_OBJECT
     QML_ELEMENT
     QML_SINGLETON
+    // Several enums share value names (Installed, UpToDate), so QML must
+    // write them in full: Installer.State.Installed.
+    Q_CLASSINFO("RegisterEnumClassesUnscoped", "false")
 
     Q_PROPERTY(State state READ state NOTIFY stateChanged)
     Q_PROPERTY(bool busy READ isBusy NOTIFY stateChanged)
@@ -46,6 +51,16 @@ class Installer : public QObject
     // What the app may access: a list of {text, needsTrust} maps.
     Q_PROPERTY(QVariantList permissions READ permissions NOTIFY packageChanged)
     Q_PROPERTY(bool permissionsKnown READ permissionsKnown NOTIFY packageChanged)
+    // When the app is already installed (state AlreadyInstalled):
+    Q_PROPERTY(Existing existing READ existing NOTIFY stateChanged)
+    Q_PROPERTY(bool existingForEveryone READ isExistingForEveryone NOTIFY stateChanged)
+    Q_PROPERTY(QString existingVersion READ existingVersion NOTIFY stateChanged)
+    // Whether the installed copy may be updated or replaced from here.
+    Q_PROPERTY(bool canChangeExisting READ canChangeExisting NOTIFY stateChanged)
+    // Whether there is anything to update, reinstall or switch to.
+    Q_PROPERTY(bool offersChange READ offersChange NOTIFY stateChanged)
+    // What the finished install did, for the "done" screen.
+    Q_PROPERTY(Outcome outcome READ outcome NOTIFY stateChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY stateChanged)
     Q_PROPERTY(QString errorDetails READ errorDetails NOTIFY stateChanged)
 
@@ -56,11 +71,31 @@ public:
         FlatpakMissing, // host has no `flatpak`
         Checking, // asking the host where we may install
         Ready, // waiting for the user to drag the app
+        AlreadyInstalled, // asking what to do with the copy that is installed
         Installing,
         Installed,
         Failed,
     };
     Q_ENUM(State)
+
+    // Mirrors ExistingInstall::Comparison for QML.
+    enum class Existing {
+        SameVersion,
+        FileIsNewer,
+        FileIsOlder,
+        DifferentVersion,
+        UpdateAvailable,
+        UpToDate,
+        Unknown,
+    };
+    Q_ENUM(Existing)
+
+    enum class Outcome {
+        Installed,
+        Updated,
+        UpToDate, // checked for updates; whether there were any isn't known
+    };
+    Q_ENUM(Outcome)
 
     // No default argument: QML would otherwise construct its own instance
     // instead of calling create().
@@ -87,6 +122,12 @@ public:
     bool sourceNeedsTrust() const;
     QVariantList permissions() const;
     bool permissionsKnown() const;
+    Existing existing() const;
+    bool isExistingForEveryone() const;
+    QString existingVersion() const;
+    bool canChangeExisting() const;
+    bool offersChange() const;
+    Outcome outcome() const;
     QString errorMessage() const;
     QString errorDetails() const;
 
@@ -94,6 +135,9 @@ public:
     Q_INVOKABLE void install(bool forEveryone);
     Q_INVOKABLE void launch();
     Q_INVOKABLE void tryAgain();
+    // For an app that is already installed:
+    Q_INVOKABLE void openExisting();
+    Q_INVOKABLE void changeExisting(); // update, reinstall or switch version
 
 Q_SIGNALS:
     void stateChanged();
@@ -114,12 +158,16 @@ private:
     void checkInstallations();
     void checkRuntime();
     void checkRemotes();
+    void checkInstalled();
+    void checkLatestCommit(std::optional<ExistingInstall::Installed> found);
     void checkRefMetadata();
     void checkFlathubMetadata();
     void finishChecks();
     void updatePermissions();
     void checkAuthorizations(QStringList actions, QList<HostEnvironment::Authorization> results);
-    void runInstall(bool forEveryone);
+    void startInstall(bool forEveryone, bool reinstall);
+    void runInstall(bool forEveryone, bool reinstall);
+    void finishInstall(const Output &output);
     void failInstall(const Output &output);
 
     State m_state = State::Empty;
@@ -133,6 +181,9 @@ private:
     bool m_systemAvailable = false;
     bool m_installedForEveryone = false;
     bool m_downloadsExtras = false;
+    std::optional<ExistingInstall::Installed> m_existing;
+    Existing m_comparison = Existing::Unknown;
+    Outcome m_outcome = Outcome::Installed;
     QString m_errorMessage;
     QString m_errorDetails;
     quint64 m_generation = 0; // ignores results of checks for a previous file

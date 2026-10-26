@@ -35,16 +35,36 @@ QString flathubRemoteName()
     return u"flathub"_s;
 }
 
-QStringList installArguments(const PackageInfo &package, const QString &path, bool forEveryone)
+QStringList installArguments(const PackageInfo &package, const QString &path, bool forEveryone, bool reinstall)
+{
+    QStringList arguments{u"install"_s, installationOption(forEveryone), u"--noninteractive"_s, u"--assumeyes"_s};
+    if (reinstall) {
+        arguments.append(u"--reinstall"_s);
+    }
+    arguments.append(package.format == PackageInfo::Format::Bundle ? u"--bundle"_s : u"--from"_s);
+    arguments.append(path);
+    return arguments;
+}
+
+QStringList updateArguments(const QString &id, const QString &branch, bool forEveryone)
+{
+    const QString ref = branch.isEmpty() ? id : id + u"//"_s + branch;
+    return {u"update"_s, installationOption(forEveryone), u"--noninteractive"_s, u"--assumeyes"_s, ref};
+}
+
+QStringList listArguments(PackageInfo::Kind kind, bool forEveryone)
 {
     return {
-        u"install"_s,
+        u"list"_s,
         installationOption(forEveryone),
-        u"--noninteractive"_s,
-        u"--assumeyes"_s,
-        package.format == PackageInfo::Format::Bundle ? u"--bundle"_s : u"--from"_s,
-        path,
+        kind == PackageInfo::Kind::Runtime ? u"--runtime"_s : u"--app"_s,
+        u"--columns=application,branch,arch,version,active"_s,
     };
+}
+
+QStringList remoteCommitArguments(const QString &remote, const PackageInfo &package, bool forEveryone)
+{
+    return {u"remote-info"_s, installationOption(forEveryone), u"--show-commit"_s, remote, partialRef(package)};
 }
 
 QStringList runArguments(const PackageInfo &package, bool forEveryone)

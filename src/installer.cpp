@@ -19,6 +19,27 @@ namespace
 {
 Installer *s_instance = nullptr;
 constexpr int kCommandNotFound = 127;
+
+Installer::Existing toExisting(ExistingInstall::Comparison comparison)
+{
+    switch (comparison) {
+    case ExistingInstall::Comparison::SameVersion:
+        return Installer::Existing::SameVersion;
+    case ExistingInstall::Comparison::FileIsNewer:
+        return Installer::Existing::FileIsNewer;
+    case ExistingInstall::Comparison::FileIsOlder:
+        return Installer::Existing::FileIsOlder;
+    case ExistingInstall::Comparison::DifferentVersion:
+        return Installer::Existing::DifferentVersion;
+    case ExistingInstall::Comparison::UpdateAvailable:
+        return Installer::Existing::UpdateAvailable;
+    case ExistingInstall::Comparison::UpToDate:
+        return Installer::Existing::UpToDate;
+    case ExistingInstall::Comparison::Unknown:
+        return Installer::Existing::Unknown;
+    }
+    return Installer::Existing::Unknown;
+}
 }
 
 Installer::Installer(QObject *parent)
@@ -108,6 +129,37 @@ bool Installer::downloadsExtras() const
     return m_downloadsExtras;
 }
 
+Installer::Existing Installer::existing() const
+{
+    return m_comparison;
+}
+
+bool Installer::isExistingForEveryone() const
+{
+    return m_existing && m_existing->forEveryone;
+}
+
+QString Installer::existingVersion() const
+{
+    return m_existing ? m_existing->version : QString();
+}
+
+bool Installer::canChangeExisting() const
+{
+    // m_systemAvailable was worked out for the change this would make.
+    return m_existing && (!m_existing->forEveryone || m_systemAvailable);
+}
+
+bool Installer::offersChange() const
+{
+    return canChangeExisting() && m_comparison != Existing::UpToDate;
+}
+
+Installer::Outcome Installer::outcome() const
+{
+    return m_outcome;
+}
+
 QString Installer::sourceTitle() const
 {
     return PermissionText::sourceTitle(m_package);
@@ -171,6 +223,9 @@ void Installer::open(const QUrl &file)
     m_systemAvailable = false;
     m_installedForEveryone = false;
     m_downloadsExtras = false;
+    m_existing.reset();
+    m_comparison = Existing::Unknown;
+    m_outcome = Outcome::Installed;
 
     const PackageFile::Result result = PackageFile::load(m_path, KLocalizedString::languages());
     Q_EMIT packageChanged();
@@ -240,13 +295,52 @@ void Installer::checkRemotes()
     runOnHost(u"flatpak"_s, FlatpakCli::remotesArguments(false), [this, apply](const Output &user) {
         apply(m_userState, user);
         if (!m_hasSystemInstallation) {
-            checkRefMetadata();
+            checkInstalled();
             return;
         }
         runOnHost(u"flatpak"_s, FlatpakCli::remotesArguments(true), [this, apply](const Output &system) {
             apply(m_systemState, system);
-            checkRefMetadata();
+            checkInstalled();
         });
+    });
+}
+
+// Is this app already installed? Look in the user's installation first,
+// which is also the one `flatpak run` prefers.
+void Installer::checkInstalled()
+{
+    runOnHost(u"flatpak"_s, FlatpakCli::listArguments(m_package.kind, false), [this](const Output &user) {
+        const QByteArray list = user.ranNormally && user.exitCode == 0 ? user.standardOutput : QByteArray();
+        std::optional<ExistingInstall::Installed> found = ExistingInstall::findInList(m_package, list, false);
+        if (found || !m_hasSystemInstallation) {
+            checkLatestCommit(found);
+            return;
+        }
+        runOnHost(u"flatpak"_s, FlatpakCli::listArguments(m_package.kind, true), [this](const Output &system) {
+            const QByteArray list = system.ranNormally && system.exitCode == 0 ? system.standardOutput : QByteArray();
+            checkLatestCommit(ExistingInstall::findInList(m_package, list, true));
+        });
+    });
+}
+
+// For a .flatpakref, ask the remote for its newest build, to tell whether
+// the installed copy is up to date.
+void Installer::checkLatestCommit(std::optional<ExistingInstall::Installed> found)
+{
+    m_existing = found;
+    const auto compare = [this](const QString &latestCommit) {
+        if (m_existing) {
+            m_comparison = toExisting(ExistingInstall::compare(m_package, *m_existing, latestCommit));
+        }
+        checkRefMetadata();
+    };
+    const QString remote = found ? (found->forEveryone ? m_systemState : m_userState).remoteName : QString();
+    if (!found || m_package.format != PackageInfo::Format::Ref || remote.isEmpty()) {
+        compare({});
+        return;
+    }
+    runOnHost(u"flatpak"_s, FlatpakCli::remoteCommitArguments(remote, m_package, found->forEveryone), [compare](const Output &info) {
+        compare(info.ranNormally && info.exitCode == 0 ? QString::fromUtf8(info.standardOutput).trimmed() : QString());
     });
 }
 
@@ -297,7 +391,13 @@ void Installer::checkFlathubMetadata()
 
 void Installer::finishChecks()
 {
-    checkAuthorizations(m_hasSystemInstallation ? HostEnvironment::systemInstallActions(m_package, m_systemState) : QStringList(), {});
+    QStringList actions;
+    if (m_hasSystemInstallation) {
+        // A system-wide copy from a remote is updated, not installed.
+        const bool updatesSystemCopy = m_existing && m_existing->forEveryone && m_package.format == PackageInfo::Format::Ref;
+        actions = updatesSystemCopy ? HostEnvironment::systemUpdateActions(m_package) : HostEnvironment::systemInstallActions(m_package, m_systemState);
+    }
+    checkAuthorizations(actions, {});
 }
 
 void Installer::checkAuthorizations(QStringList actions, QList<HostEnvironment::Authorization> results)
@@ -305,7 +405,7 @@ void Installer::checkAuthorizations(QStringList actions, QList<HostEnvironment::
     if (actions.isEmpty()) {
         const bool steamOS = HostEnvironment::isSteamOS(HostEnvironment::readHostOsRelease(HostCommand::runningInFlatpak()));
         m_systemAvailable = HostEnvironment::offerSystemInstall(m_hasSystemInstallation, results, steamOS);
-        setState(State::Ready);
+        setState(m_existing ? State::AlreadyInstalled : State::Ready);
         return;
     }
 
@@ -323,40 +423,86 @@ void Installer::install(bool forEveryone)
     if (m_state != State::Ready || (forEveryone && !m_systemAvailable)) {
         return;
     }
+    m_outcome = Outcome::Installed;
+    startInstall(forEveryone, false);
+}
+
+void Installer::changeExisting()
+{
+    if (m_state != State::AlreadyInstalled || !offersChange()) {
+        return;
+    }
+    const bool forEveryone = m_existing->forEveryone;
+    if (m_package.format == PackageInfo::Format::Ref) {
+        // A .flatpakref can't be reinstalled from; update from its remote.
+        m_outcome = m_comparison == Existing::UpdateAvailable ? Outcome::Updated : Outcome::UpToDate;
+        m_installedForEveryone = forEveryone;
+        m_downloadsExtras = false;
+        setState(State::Installing);
+        runOnHost(u"flatpak"_s, FlatpakCli::updateArguments(m_package.id, m_existing->branch, forEveryone), [this](const Output &output) {
+            finishInstall(output);
+        });
+        return;
+    }
+    m_outcome = m_comparison == Existing::FileIsNewer ? Outcome::Updated : Outcome::Installed;
+    startInstall(forEveryone, true);
+}
+
+void Installer::startInstall(bool forEveryone, bool reinstall)
+{
     const HostEnvironment::InstallationState &target = forEveryone ? m_systemState : m_userState;
     m_installedForEveryone = forEveryone;
     m_downloadsExtras = !target.runtimeInstalled;
     setState(State::Installing);
 
     if (!HostEnvironment::needsFlathub(m_package, target)) {
-        runInstall(forEveryone);
+        runInstall(forEveryone, reinstall);
         return;
     }
     const QStringList addFlathub = FlatpakCli::addRemoteArguments(FlatpakCli::flathubRemoteName(), FlatpakCli::flathubRepoFile(), forEveryone);
-    runOnHost(u"flatpak"_s, addFlathub, [this, forEveryone](const Output &output) {
+    runOnHost(u"flatpak"_s, addFlathub, [this, forEveryone, reinstall](const Output &output) {
         if (output.ranNormally && output.exitCode == 0) {
-            runInstall(forEveryone);
+            runInstall(forEveryone, reinstall);
             return;
         }
         failInstall(output);
     });
 }
 
-void Installer::runInstall(bool forEveryone)
+void Installer::runInstall(bool forEveryone, bool reinstall)
 {
-    runOnHost(u"flatpak"_s, FlatpakCli::installArguments(m_package, m_path, forEveryone), [this](const Output &output) {
-        if (output.ranNormally && output.exitCode == 0) {
-            setState(State::Installed);
-            return;
-        }
-        failInstall(output);
+    runOnHost(u"flatpak"_s, FlatpakCli::installArguments(m_package, m_path, forEveryone, reinstall), [this](const Output &output) {
+        finishInstall(output);
     });
+}
+
+void Installer::finishInstall(const Output &output)
+{
+    if (output.ranNormally && output.exitCode == 0) {
+        setState(State::Installed);
+        return;
+    }
+    failInstall(output);
+}
+
+void Installer::openExisting()
+{
+    if (m_state != State::AlreadyInstalled || !m_existing || !canLaunch()) {
+        return;
+    }
+    PackageInfo installed = m_package;
+    installed.branch = m_existing->branch;
+    QProcess *process = HostCommand::create(u"flatpak"_s, FlatpakCli::runArguments(installed, m_existing->forEveryone), nullptr);
+    process->startDetached();
+    delete process;
 }
 
 void Installer::failInstall(const Output &output)
 {
     const QString details = QString::fromUtf8(output.standardError + output.standardOutput).trimmed();
-    fail(State::Failed, i18n("“%1” couldn't be installed.", m_package.displayName()), details);
+    fail(State::Failed,
+         m_outcome == Outcome::Installed ? i18n("“%1” couldn't be installed.", m_package.displayName()) : i18n("“%1” couldn't be updated.", m_package.displayName()),
+         details);
 }
 
 void Installer::launch()
@@ -374,7 +520,7 @@ void Installer::tryAgain()
     if (m_state == State::Failed) {
         m_errorMessage.clear();
         m_errorDetails.clear();
-        setState(State::Ready);
+        setState(m_existing ? State::AlreadyInstalled : State::Ready);
     }
 }
 

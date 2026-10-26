@@ -1,14 +1,14 @@
 # Flatpak App Installer
 
-讓完全不懂 Linux 的人，也能像在 Mac 上一樣安裝 App：在下載好的 `.flatpak` 或 `.flatpakref` 檔案上按兩下（或把檔案拖進視窗），再把 App 拖到「只給我用」或「給這台電腦的所有人」就好。安裝前會用白話說明 App 從哪裡來、可以存取哪些東西；缺少的元件（runtime）會自動從 Flathub 下載。
+讓完全不懂 Linux 的人，也能像在 Mac 上一樣安裝 App：在下載好的 `.flatpak` 或 `.flatpakref` 檔案上按兩下（或把檔案拖進視窗），再把 App 拖到「只給我用」或「給這台電腦的所有人」就好。安裝前會用白話說明 App 從哪裡來、可以存取哪些東西；已經裝過的話，會說明版本差在哪裡，讓使用者選擇開啟、更新或替換；缺少的元件（runtime）會自動從 Flathub 下載。
 
 | 準備安裝 | 拖曳中 | 安裝完成 |
 |---|---|---|
 | ![準備安裝](docs/screenshots/ready.png) | ![拖曳中](docs/screenshots/dragging.png) | ![安裝完成](docs/screenshots/installed.png) |
 
-| 安裝前列出來源與權限 | 把檔案拖進視窗 | SteamOS：自動隱藏「給這台電腦的所有人」 |
-|---|---|---|
-| ![安裝前列出來源與權限](docs/screenshots/permissions.png) | ![把檔案拖進視窗](docs/screenshots/drop-file.png) | ![SteamOS](docs/screenshots/steamos.png) |
+| 安裝前列出來源與權限 | 已經裝過時 | 把檔案拖進視窗 | SteamOS：自動隱藏「給這台電腦的所有人」 |
+|---|---|---|---|
+| ![安裝前列出來源與權限](docs/screenshots/permissions.png) | ![已經裝過時](docs/screenshots/already-installed.png) | ![把檔案拖進視窗](docs/screenshots/drop-file.png) | ![SteamOS](docs/screenshots/steamos.png) |
 
 > 截圖是在沒有 KDE 桌面主題的虛擬螢幕上拍的；在 Plasma 上會套用系統的外觀。
 
@@ -32,6 +32,7 @@ v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirem
                      │    flatpak --installations
                      │    flatpak info <runtime>        ← runtime 裝了沒
                      │    flatpak remotes               ← Flathub 設定了沒
+                     │    flatpak list                  ← 是不是已經裝過
                      │    flatpak remote-info …         ← .flatpakref 的權限
                      │      （遠端沒設定時改問 flathub.org/api/v2/summary/…）
                      │    pkcheck --action-id …         ← 決定要不要顯示「系統」
@@ -51,6 +52,7 @@ v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirem
 | `src/flatpakcli.*` | 組出 `flatpak` 指令的參數 |
 | `src/permissions.*` | 從 metadata 整理出 App 的權限與來源 |
 | `src/permissiontext.*` | 把權限與來源寫成白話的翻譯文字 |
+| `src/existinginstall.*` | 找出已安裝的版本，並和檔案裡的版本比較 |
 | `src/flathubclient.*` | 遠端還沒設定時，向 Flathub 網站查詢 `.flatpakref` 的權限 |
 | `src/installer.*` | 給 QML 用的狀態與操作 |
 | `src/filedroparea.*` | 接收從檔案管理員或瀏覽器拖進視窗的檔案 |

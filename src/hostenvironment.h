@@ -54,6 +54,10 @@ bool needsFlathub(const PackageInfo &package, const InstallationState &state);
 // polkit actions flatpak's system helper checks for this install.
 QStringList systemInstallActions(const PackageInfo &package, const InstallationState &system);
 
+// polkit action for updating a system-wide app or runtime from its remote.
+// Allowed without a password by flatpak's default policy.
+QStringList systemUpdateActions(const PackageInfo &package);
+
 // The name of the configured remote whose URL is `remoteUrl`, or an empty
 // string. `remotesOutput` is the output of
 // `flatpak remotes --columns=name,url`: one "name<TAB>url" line per remote.
