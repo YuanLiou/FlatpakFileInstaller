@@ -1,0 +1,90 @@
+# Flatpak App Installer
+
+讓完全不懂 Linux 的人，也能像在 Mac 上一樣安裝 App：在下載好的 `.flatpak` 或 `.flatpakref` 檔案上按兩下，再把 App 拖到「只給我用」或「給這台電腦的所有人」就好。
+
+| 準備安裝 | 拖曳中 | 安裝完成 |
+|---|---|---|
+| ![準備安裝](docs/screenshots/ready.png) | ![拖曳中](docs/screenshots/dragging.png) | ![安裝完成](docs/screenshots/installed.png) |
+
+在 SteamOS 這類無法安裝到系統的環境，「給這台電腦的所有人」會自動隱藏：
+
+![SteamOS](docs/screenshots/steamos.png)
+
+> 截圖是在沒有 KDE 桌面主題的虛擬螢幕上拍的；在 Plasma 上會套用系統的外觀。
+
+## 狀態
+
+v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirements.md`](docs/requirements.md)。
+
+- 「只給我用」對應 `flatpak install --user`，「給這台電腦的所有人」對應 `--system`。
+- 發布方式：Flatpak（目標是上架 Flathub）與 AppImage，支援 x86_64 與 aarch64。
+- 以 KDE Plasma、Fedora 44（不可變系統）與 SteamOS 為主要目標。
+
+## 運作方式
+
+```
+.flatpak / .flatpakref
+        │  解析檔案（不安裝）：名稱、圖示、版本、需要的 runtime
+        ▼
+  PackageFile ──► Installer ──► QML 介面（Kirigami，拖曳安裝）
+                     │
+                     │  在主機上執行：
+                     │    flatpak --installations
+                     │    flatpak remotes --system
+                     │    pkcheck --action-id …      ← 決定要不要顯示「系統」
+                     │    flatpak install --user|--system …
+                     ▼
+               HostCommand
+                 Flatpak 版：flatpak-spawn --host …
+                 AppImage 版：直接執行，並移除 AppImage 自己的函式庫路徑
+```
+
+| 檔案 | 用途 |
+|---|---|
+| `src/packagefile.*` | 讀取 `.flatpak`（OSTree static delta 格式的 GVariant）與 `.flatpakref`（key file） |
+| `src/hostenvironment.*` | 判斷能不能安裝到系統：主機發行版、polkit 授權結果 |
+| `src/hostcommand.*` | 在主機上執行指令 |
+| `src/flatpakcli.*` | 組出 `flatpak` 指令的參數 |
+| `src/installer.*` | 給 QML 用的狀態與操作 |
+| `src/qml/` | 介面 |
+| `po/` | 翻譯 |
+| `packaging/` | Flatpak manifest 與 AppImage 建置腳本 |
+
+## 建置
+
+需要 Qt 6.8 以上、KDE Frameworks 6.9 以上（Kirigami、KI18n、KCoreAddons、KArchive）、GLib、gettext 與 Extra CMake Modules。Ubuntu 26.04 上的完整套件清單見 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)。
+
+```sh
+cmake -S . -B build -G Ninja
+cmake --build build
+QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
+./build/bin/flatpak-app-installer path/to/app.flatpak
+```
+
+`installtest` 會用真正的 `flatpak` 指令，把測試用的 App 裝進暫存目錄；沒有 `flatpak` 或 `busybox` 時會自動略過。
+
+### Flatpak
+
+```sh
+flatpak-builder --user --install --force-clean build-flatpak packaging/flatpak/io.github.yuanliou.FlatpakAppInstaller.yml
+```
+
+### AppImage
+
+```sh
+packaging/appimage/build-appimage.sh
+```
+
+## 翻譯
+
+原始字串是英文，翻譯放在 `po/<語言代碼>.po`。
+
+- 改過介面文字後：執行 `scripts/update-translations.sh`，再更新各語言的 `.po`。CI 會檢查翻譯檔是否跟程式碼同步。
+- 新增語言：把語言代碼（例如 `ja`）加進 `po/LINGUAS`，執行 `scripts/update-translations.sh`，再翻譯產生出來的 `po/ja.po`。
+- `.desktop` 檔和 AppStream metainfo 的翻譯也來自同一份 `.po`。
+
+翻譯原則：讀者是完全不懂 Linux 的人，用日常用語，避免技術術語。
+
+## 授權
+
+[Apache License 2.0](LICENSE)。AppStream metainfo 以 CC0-1.0 授權。

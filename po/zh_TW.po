@@ -1,0 +1,220 @@
+# Traditional Chinese (Taiwan) translation of Flatpak App Installer.
+# SPDX-License-Identifier: Apache-2.0
+#
+# 翻譯原則：讀者是完全不懂 Linux 的人。用台灣日常用語，避免技術術語；
+# 「App」維持英文，與台灣手機與電腦介面的習慣一致。
+msgid ""
+msgstr ""
+"Project-Id-Version: flatpak-app-installer\n"
+"Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/"
+"issues\n"
+"POT-Creation-Date: 2026-10-26 07:02+0000\n"
+"PO-Revision-Date: 2026-10-26 06:46+0000\n"
+"Last-Translator: \n"
+"Language-Team: Chinese (Taiwan)\n"
+"Language: zh_TW\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in
+msgid "App Installer"
+msgstr "App 安裝程式"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in
+#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in src/main.cpp
+#: src/qml/Main.qml
+#, kde-format
+msgid "Flatpak App Installer"
+msgstr "Flatpak App 安裝程式"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in src/main.cpp
+#, kde-format
+msgid "Install apps you downloaded from the internet"
+msgstr "安裝你從網路下載的 App"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in
+msgid "flatpak;flathub;install;app;software;"
+msgstr "flatpak;flathub;install;app;software;安裝;應用程式;軟體;"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+msgid "Install downloaded apps by dragging them"
+msgstr "用拖曳的方式安裝下載的 App"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+msgid ""
+"Downloaded an app that ends in “.flatpak” or “.flatpakref”? Double-click it "
+"and drag the app to where you want to install it, just like on a Mac."
+msgstr ""
+"下載了檔名結尾是「.flatpak」或「.flatpakref」的 App 嗎？在檔案上按兩下，再把 "
+"App 拖到你想安裝的位置就好，跟在 Mac 上安裝一樣簡單。"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+msgid ""
+"Choose “Just for me” to install it only for yourself, or “Everyone on this "
+"computer” so that everybody who uses the computer can open it."
+msgstr ""
+"選「只給我用」就只有你能使用；選「給這台電腦的所有人」，每個使用這台電腦的人"
+"都能開啟。"
+
+#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+msgid "First development version."
+msgstr "第一個開發版本。"
+
+#: src/installer.cpp
+#, kde-format
+msgid ""
+"This computer can't install Flatpak apps yet, because the Flatpak software "
+"isn't installed."
+msgstr "這台電腦還沒有安裝 Flatpak，所以暫時沒辦法安裝 Flatpak App。"
+
+#: src/installer.cpp
+#, kde-format
+msgid "This file can't be opened. It may have been moved or deleted."
+msgstr "這個檔案打不開，可能已經被移動或刪除了。"
+
+#: src/installer.cpp
+#, kde-format
+msgid ""
+"This file isn't an app that can be installed here. Look for a download that "
+"ends in “.flatpak” or “.flatpakref”."
+msgstr ""
+"這個檔案不是可以在這裡安裝的 App。請找檔名結尾是「.flatpak」或「.flatpakref」"
+"的下載檔案。"
+
+#: src/installer.cpp
+#, kde-format
+msgid "“%1” couldn't be installed."
+msgstr "「%1」沒有安裝成功。"
+
+#: src/main.cpp
+#, kde-format
+msgid "The .flatpak or .flatpakref file to install"
+msgstr "要安裝的 .flatpak 或 .flatpakref 檔案"
+
+#: src/qml/Main.qml
+msgid ""
+"Ask the person who manages this computer to install Flatpak, or see "
+"flatpak.org/setup for instructions."
+msgstr ""
+"請管理這台電腦的人幫忙安裝 Flatpak，或到 flatpak.org/setup 查看安裝說明。"
+
+#: src/qml/Main.qml
+msgid "By %1"
+msgstr "開發者：%1"
+
+#: src/qml/Main.qml
+msgid "Choose Another File…"
+msgstr "選擇其他檔案…"
+
+#: src/qml/Main.qml
+msgid "Choose File…"
+msgstr "選擇檔案…"
+
+#: src/qml/Main.qml
+msgid "Close"
+msgstr "關閉"
+
+#: src/qml/Main.qml
+msgid "Done"
+msgstr "完成"
+
+#: src/qml/Main.qml
+msgid ""
+"Double-click an app you downloaded (a file ending in “.flatpak” or "
+"“.flatpakref”), or choose one here."
+msgstr ""
+"在下載好的 App 檔案（檔名結尾是「.flatpak」或「.flatpakref」）上按兩下，或是"
+"在這裡選擇檔案。"
+
+#: src/qml/Main.qml
+msgid "Drag the app onto where you want to install it."
+msgstr "把 App 拖到你想安裝的位置。"
+
+#: src/qml/Main.qml
+msgid "Everyone on this computer"
+msgstr "給這台電腦的所有人"
+
+#: src/qml/Main.qml
+msgid "Everyone on this computer can now find it in the app menu."
+msgstr "這台電腦的所有人現在都可以在應用程式選單裡找到它。"
+
+#: src/qml/Main.qml
+msgid ""
+"Everyone who uses this computer can open it. You may need to enter your "
+"password."
+msgstr "每個使用這台電腦的人都能開啟，可能需要輸入你的密碼。"
+
+#: src/qml/Main.qml
+msgctxt "File dialog filter; keep the parentheses and the patterns unchanged"
+msgid "Flatpak apps (*.flatpak *.flatpakref)"
+msgstr "Flatpak App (*.flatpak *.flatpakref)"
+
+#: src/qml/Main.qml
+msgid "Getting ready…"
+msgstr "準備中…"
+
+#: src/qml/Main.qml
+msgid "Hide Details"
+msgstr "隱藏詳細資訊"
+
+#: src/qml/Main.qml
+msgid "Install an app"
+msgstr "安裝 App"
+
+#: src/qml/Main.qml
+msgid "Install “%1”"
+msgstr "安裝「%1」"
+
+#: src/qml/Main.qml
+msgid "Installing “%1”…"
+msgstr "正在安裝「%1」…"
+
+#: src/qml/Main.qml
+msgid "Just for me"
+msgstr "只給我用"
+
+#: src/qml/Main.qml
+msgid "Needs %1 of space"
+msgstr "需要 %1 的空間"
+
+#: src/qml/Main.qml
+msgid "Only you can use it. No password needed."
+msgstr "只有你能使用，不需要輸入密碼。"
+
+#: src/qml/Main.qml
+msgid "Open “%1”"
+msgstr "開啟「%1」"
+
+#: src/qml/Main.qml
+msgid "Please check your internet connection and try again."
+msgstr "請檢查網路連線，然後再試一次。"
+
+#: src/qml/Main.qml
+msgid "Please wait until the installation is finished."
+msgstr "請等安裝完成後再關閉。"
+
+#: src/qml/Main.qml
+msgid "Show Details"
+msgstr "顯示詳細資訊"
+
+#: src/qml/Main.qml
+msgid "This may take a few minutes. Please keep this window open."
+msgstr "可能需要幾分鐘，請不要關閉這個視窗。"
+
+#: src/qml/Main.qml
+msgid "Try Again"
+msgstr "再試一次"
+
+#: src/qml/Main.qml
+msgid "Version %1"
+msgstr "版本 %1"
+
+#: src/qml/Main.qml
+msgid "You can now find it in your app menu."
+msgstr "現在可以在應用程式選單裡找到它了。"
+
+#: src/qml/Main.qml
+msgid "“%1” is installed"
+msgstr "「%1」安裝好了"

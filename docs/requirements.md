@@ -38,6 +38,7 @@
 3. **AppImage 不會自動成為 `.flatpak` 的預設開啟程式**：需要 app 在第一次執行時協助註冊，或依賴 Gear Lever 等整合工具。
 4. **AppImage 與 FUSE**：舊版 AppImage runtime 需要主機有 libfuse2；應使用新版靜態連結的 type2 runtime。尚未在 Fedora 44 Atomic／SteamOS 上實測。
 5. **只能拖曳的無障礙限制**：只用鍵盤或輔助工具的使用者無法完成安裝。這是已確認的產品決定，在此記錄其影響。
+6. **帶有 `runtime-repo` 的 bundle 離線裝不起來**：實測 flatpak 每次安裝這類 bundle 都會去下載 `.flatpakrepo`，即使 runtime 已經裝好也一樣，沒有網路就會失敗。目前的錯誤訊息會請使用者檢查網路連線。
 
 ## 判斷能否安裝到系統（P9）
 
@@ -60,7 +61,22 @@
 
 已知取捨：SteamOS 使用者若自己設定過密碼，「系統」仍會被隱藏，因為程式無法在不取得 root 的情況下得知帳號有沒有密碼。
 
-## 尚未決定
+## 已決定的工程事項
 
-- [x] 程式語言：C++（UI 用 Qt 6 + Kirigami／QML）
-- [ ] 授權條款
+- 程式語言：C++20（UI 用 Qt 6 + Kirigami／QML）
+- 授權條款：Apache-2.0
+- App ID：`io.github.yuanliou.FlatpakAppInstaller`
+- 最低版本：Qt 6.8、KDE Frameworks 6.9；Flatpak 版使用 KDE runtime 6.10
+
+## 實作進度（v0.1.0 骨架）
+
+| 需求 | 狀態 |
+|---|---|
+| P1 `.flatpak`／`.flatpakref` | ✅ 解析與安裝 |
+| P2 白話文字 | ✅ 所有畫面 |
+| P3 缺少 runtime 自動補 | ⏳ 未做；目前只靠 bundle 內的 `runtime-repo` |
+| P4 權限與來源警告 | ⏳ 未做；bundle 內的 metadata 已帶有權限資料，還沒解析 |
+| P5 已安裝過的選單 | ⏳ 未做 |
+| P7 多國語言架構 + `zh_TW` | ✅ |
+| P8 只能拖曳 | ✅ |
+| P9 判斷並隱藏「系統」 | ✅ 邏輯與單元測試；尚未在 Fedora 44／SteamOS 實機驗證 |

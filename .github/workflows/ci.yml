@@ -1,0 +1,109 @@
+# SPDX-License-Identifier: Apache-2.0
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Build and test (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    # Ubuntu 26.04 ships Qt 6.10 and KF 6.24, close to Fedora 44.
+    container: ubuntu:26.04
+    steps:
+      # Before checkout, so that checkout finds git and keeps .git around.
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build pkg-config gettext extra-cmake-modules git ca-certificates \
+            qt6-base-dev qt6-declarative-dev qt6-declarative-dev-tools qt6-tools-dev \
+            libkirigami-dev libkf6i18n-dev libkf6coreaddons-dev libkf6archive-dev libglib2.0-dev \
+            qml6-module-org-kde-kirigami qml6-module-org-kde-desktop qml6-module-qtquick \
+            qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtquick-templates \
+            qml6-module-qtquick-window qml6-module-qtquick-dialogs qml6-module-qtqml-workerscript \
+            qt6-svg-plugins appstream desktop-file-utils flatpak busybox-static python3
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+      - name: Build
+        run: cmake --build build
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+        env:
+          QT_QPA_PLATFORM: offscreen
+      - name: Translations are up to date
+        run: |
+          sh scripts/update-translations.sh
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git diff --ignore-matching-lines='^"POT-Creation-Date:' --exit-code po/
+
+  flatpak:
+    name: Flatpak (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    container:
+      image: ghcr.io/flathub-infra/flatpak-github-actions:kde-6.10
+      options: --privileged
+    steps:
+      - uses: actions/checkout@v4
+      - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
+        with:
+          bundle: FlatpakAppInstaller-${{ matrix.arch }}.flatpak
+          manifest-path: packaging/flatpak/io.github.yuanliou.FlatpakAppInstaller.yml
+          arch: ${{ matrix.arch }}
+          cache-key: flatpak-builder-${{ matrix.arch }}-${{ github.sha }}
+
+  appimage:
+    name: AppImage (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: aarch64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    container: ubuntu:26.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          apt-get update
+          DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+            build-essential cmake ninja-build pkg-config gettext extra-cmake-modules ca-certificates curl file \
+            qt6-base-dev qt6-base-dev-tools qt6-declarative-dev qt6-declarative-dev-tools qt6-tools-dev qt6-wayland \
+            libkirigami-dev libkf6i18n-dev libkf6coreaddons-dev libkf6archive-dev libglib2.0-dev \
+            qml6-module-org-kde-kirigami qml6-module-org-kde-desktop qml6-module-qtquick \
+            qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtquick-templates \
+            qml6-module-qtquick-window qml6-module-qtquick-dialogs qml6-module-qtqml-workerscript \
+            qt6-svg-plugins
+      - name: Build AppImage
+        run: sh packaging/appimage/build-appimage.sh build-appimage
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AppImage-${{ matrix.arch }}
+          path: build-appimage/*.AppImage

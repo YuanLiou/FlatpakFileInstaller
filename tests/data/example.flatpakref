@@ -1,0 +1,9 @@
+[Flatpak Ref]
+Title=Example Notes
+Name=org.example.Notes
+Branch=stable
+Url=https://dl.flathub.org/repo/
+SuggestRemoteName=flathub
+Comment=Write things down
+IsRuntime=false
+RuntimeRepo=https://dl.flathub.org/repo/flathub.flatpakrepo
