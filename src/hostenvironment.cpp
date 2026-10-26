@@ -4,8 +4,6 @@
 #include <QFile>
 #include <QUrl>
 
-#include <algorithm>
-
 using namespace Qt::StringLiterals;
 
 namespace HostEnvironment
@@ -26,8 +24,12 @@ QString unquote(QString value)
 
 QString normalizedUrl(const QString &url)
 {
-    QString normalized = QUrl(url.trimmed()).adjusted(QUrl::NormalizePathSegments | QUrl::StripTrailingSlash).toString();
-    return normalized.toLower();
+    QUrl normalized = QUrl(url.trimmed()).adjusted(QUrl::NormalizePathSegments | QUrl::StripTrailingSlash);
+    // StripTrailingSlash keeps a lone "/", so "https://host/" and "https://host" would differ.
+    if (normalized.path() == "/"_L1) {
+        normalized.setPath(QString());
+    }
+    return normalized.toString().toLower();
 }
 
 } // namespace
@@ -114,16 +116,20 @@ QStringList systemInstallActions(const PackageInfo &package, const InstallationS
     return actions;
 }
 
-bool isRemoteConfigured(const QString &remoteUrl, const QByteArray &remotesOutput)
+QString remoteNameForUrl(const QString &remoteUrl, const QByteArray &remotesOutput)
 {
     if (remoteUrl.trimmed().isEmpty()) {
-        return false;
+        return {};
     }
     const QString wanted = normalizedUrl(remoteUrl);
     const QStringList lines = QString::fromUtf8(remotesOutput).split(u'\n', Qt::SkipEmptyParts);
-    return std::ranges::any_of(lines, [&](const QString &line) {
-        return normalizedUrl(line) == wanted;
-    });
+    for (const QString &line : lines) {
+        const QStringList columns = line.split(u'\t');
+        if (columns.size() >= 2 && normalizedUrl(columns.at(1)) == wanted) {
+            return columns.at(0).trimmed();
+        }
+    }
+    return {};
 }
 
 bool offerSystemInstall(bool hasSystemInstallation, const QList<Authorization> &authorizations, bool steamOS)

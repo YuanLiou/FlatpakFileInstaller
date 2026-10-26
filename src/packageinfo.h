@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 #pragma once
 
+#include <QByteArray>
 #include <QImage>
 #include <QString>
 
@@ -32,6 +33,10 @@ struct PackageInfo {
     QString runtimeRepoUrl; // .flatpakrepo that provides the runtime
     QString remoteUrl; // .flatpakref: repository URL; bundle: origin URL
     quint64 installedSize = 0; // bytes, 0 when unknown
+
+    // The app's Flatpak metadata (permissions etc.). Bundles carry it;
+    // for a .flatpakref it has to be fetched from the remote.
+    QByteArray metadata;
 
     // Name to show; falls back to the last part of the ID.
     QString displayName() const;

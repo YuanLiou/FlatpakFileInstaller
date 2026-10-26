@@ -12,6 +12,12 @@ QString installationOption(bool forEveryone)
 {
     return forEveryone ? u"--system"_s : u"--user"_s;
 }
+
+// "id//branch", or just "id" to let flatpak pick the branch.
+QString partialRef(const PackageInfo &package)
+{
+    return package.branch.isEmpty() ? package.id : package.id + u"//"_s + package.branch;
+}
 }
 
 QString flathubUrl()
@@ -43,11 +49,7 @@ QStringList installArguments(const PackageInfo &package, const QString &path, bo
 
 QStringList runArguments(const PackageInfo &package, bool forEveryone)
 {
-    QString ref = package.id;
-    if (!package.branch.isEmpty()) {
-        ref += u"//"_s + package.branch;
-    }
-    return {u"run"_s, installationOption(forEveryone), ref};
+    return {u"run"_s, installationOption(forEveryone), partialRef(package)};
 }
 
 QStringList addRemoteArguments(const QString &name, const QString &repoFile, bool forEveryone)
@@ -57,7 +59,12 @@ QStringList addRemoteArguments(const QString &name, const QString &repoFile, boo
 
 QStringList remotesArguments(bool forEveryone)
 {
-    return {u"remotes"_s, installationOption(forEveryone), u"--columns=url"_s};
+    return {u"remotes"_s, installationOption(forEveryone), u"--columns=name,url"_s};
+}
+
+QStringList remoteInfoArguments(const QString &remote, const PackageInfo &package, bool forEveryone)
+{
+    return {u"remote-info"_s, installationOption(forEveryone), u"--show-metadata"_s, remote, partialRef(package)};
 }
 
 QStringList runtimeInfoArguments(const QString &runtime, bool forEveryone)

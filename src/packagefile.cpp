@@ -166,6 +166,7 @@ PackageFile::Result parseBundleBytes(GBytes *bytes, const QStringList &languages
     info.runtimeRepoUrl = lookupString(metadata, "runtime-repo");
 
     const QByteArray appMetadata = lookupString(metadata, "metadata").toUtf8();
+    info.metadata = appMetadata;
     g_autoptr(GKeyFile) keyFile = g_key_file_new();
     if (g_key_file_load_from_data(keyFile, appMetadata.constData(), appMetadata.size(), G_KEY_FILE_NONE, nullptr)) {
         g_autofree gchar *runtime = g_key_file_get_string(keyFile, "Application", "runtime", nullptr);

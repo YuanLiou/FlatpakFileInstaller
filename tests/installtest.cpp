@@ -6,6 +6,7 @@
 #include "hostcommand.h"
 #include "hostenvironment.h"
 #include "packagefile.h"
+#include "permissions.h"
 
 #include <QProcess>
 #include <QStandardPaths>
@@ -84,8 +85,8 @@ private Q_SLOTS:
 
         HostEnvironment::InstallationState state;
         state.runtimeInstalled = flatpak(FlatpakCli::runtimeInfoArguments(package.runtime, false), installation)->exitCode() == 0;
-        state.flathubConfigured = HostEnvironment::isRemoteConfigured(
-            FlatpakCli::flathubUrl(), flatpak(FlatpakCli::remotesArguments(false), installation)->readAllStandardOutput());
+        state.flathubConfigured = !HostEnvironment::remoteNameForUrl(
+            FlatpakCli::flathubUrl(), flatpak(FlatpakCli::remotesArguments(false), installation)->readAllStandardOutput()).isEmpty();
         QVERIFY(!state.runtimeInstalled);
         QVERIFY(HostEnvironment::needsFlathub(package, state));
 
@@ -97,6 +98,28 @@ private Q_SLOTS:
         QProcess *install = flatpak(FlatpakCli::installArguments(package, bundle, false), installation);
         QVERIFY2(install->exitCode() == 0, install->readAllStandardError().constData());
         QCOMPARE(flatpak(FlatpakCli::runtimeInfoArguments(package.runtime, false), installation)->exitCode(), 0);
+    }
+
+    // What Installer does to show a .flatpakref's permissions: find the
+    // remote by URL, then ask it for the app's metadata.
+    void readsRefPermissionsFromRemote()
+    {
+        const QString installation = u"ref-metadata"_s;
+        const auto result = PackageFile::load(m_dir.filePath(u"notes-hub.flatpakref"_s), {});
+        QVERIFY(result.info);
+        const PackageInfo &package = *result.info;
+        QVERIFY(package.metadata.isEmpty());
+
+        QProcess *addRemote = flatpak(FlatpakCli::addRemoteArguments(u"testhub"_s, m_dir.filePath(u"hub.flatpakrepo"_s), false), installation);
+        QVERIFY2(addRemote->exitCode() == 0, addRemote->readAllStandardError().constData());
+        const QString remote = HostEnvironment::remoteNameForUrl(package.remoteUrl, flatpak(FlatpakCli::remotesArguments(false), installation)->readAllStandardOutput());
+        QCOMPARE(remote, u"testhub"_s);
+
+        QProcess *info = flatpak(FlatpakCli::remoteInfoArguments(remote, package, false), installation);
+        QVERIFY2(info->exitCode() == 0, info->readAllStandardError().constData());
+        const QList<Permissions::Permission> permissions = Permissions::fromMetadata(info->readAllStandardOutput());
+        QCOMPARE(permissions.size(), 3);
+        QCOMPARE(permissions.at(0).kind, Permissions::Kind::HomeFolder);
     }
 
     // A user install can use a runtime that is only installed system-wide,

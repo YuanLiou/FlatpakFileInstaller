@@ -10,8 +10,10 @@
 #                    is already there, so the offline install test needs this
 #   hello.flatpak    org.spike.Hello//stable, a minimal app with no AppStream data
 #   hub-repo/, hub.flatpakrepo
-#                    a local repository that only has the runtime, standing in
-#                    for Flathub when testing that a missing runtime is fetched
+#                    a local repository with the runtime and the notes app,
+#                    standing in for Flathub when testing that a missing
+#                    runtime is fetched and that a ref's permissions are read
+#   notes-hub.flatpakref  points to the notes app in hub-repo
 #
 # notes.flatpak and hello.flatpak are checked in (built on x86_64);
 # runtime.flatpak is not, because it contains a busybox binary. The install
@@ -39,8 +41,6 @@ build_runtime() { # <id>
 build_runtime org.test.Platform
 flatpak build-bundle --runtime repo "$OUT/runtime.flatpak" org.test.Platform 1
 flatpak build-export --runtime "$OUT/hub-repo" rt 1 >/dev/null
-flatpak build-update-repo "$OUT/hub-repo" >/dev/null
-printf '[Flatpak Repo]\nTitle=Test Hub\nUrl=file://%s/hub-repo\n' "$OUT" > "$OUT/hub.flatpakrepo"
 
 build_runtime org.spike.Platform
 flatpak build-bundle --runtime repo spike.flatpak org.spike.Platform 1
@@ -79,6 +79,10 @@ flatpak build-finish notes --command=notes --share=network --socket=wayland --so
 flatpak build-export repo notes stable >/dev/null
 flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo repo "$OUT/notes.flatpak" org.example.Notes stable
 flatpak build-bundle repo "$OUT/notes-offline.flatpak" org.example.Notes stable
+flatpak build-export "$OUT/hub-repo" notes stable >/dev/null
+flatpak build-update-repo "$OUT/hub-repo" >/dev/null
+printf '[Flatpak Repo]\nTitle=Test Hub\nUrl=file://%s/hub-repo\n' "$OUT" > "$OUT/hub.flatpakrepo"
+printf '[Flatpak Ref]\nName=org.example.Notes\nBranch=stable\nTitle=Notes\nUrl=file://%s/hub-repo\n' "$OUT" > "$OUT/notes-hub.flatpakref"
 
 # org.spike.Hello
 flatpak build-init hello org.spike.Hello org.spike.Platform org.spike.Platform 1
