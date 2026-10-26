@@ -16,10 +16,10 @@ target_link_libraries(installer_core
     PRIVATE KF6::Archive PkgConfig::GLIB
 )
 
-add_executable(flatpak-app-installer main.cpp)
+add_executable(flatpak-file-installer main.cpp)
 
-qt_add_qml_module(flatpak-app-installer
-    URI io.github.yuanliou.FlatpakAppInstaller
+qt_add_qml_module(flatpak-file-installer
+    URI io.github.yuanliou.FlatpakFileInstaller
     VERSION 1.0
     QML_FILES
         qml/Main.qml
@@ -36,7 +36,7 @@ qt_add_qml_module(flatpak-app-installer
 )
 
 set_source_files_properties(${PROJECT_SOURCE_DIR}/data/icons/${APP_ID}.svg PROPERTIES QT_RESOURCE_ALIAS app.svg)
-qt_add_resources(flatpak-app-installer icons
+qt_add_resources(flatpak-file-installer icons
     PREFIX /icons
     BASE icons
     FILES
@@ -51,12 +51,12 @@ qt_add_resources(flatpak-app-installer icons
         icons/user.svg
 )
 
-target_compile_definitions(flatpak-app-installer PRIVATE
+target_compile_definitions(flatpak-file-installer PRIVATE
     TRANSLATION_DOMAIN="${TRANSLATION_DOMAIN}"
     APP_ID="${APP_ID}"
     APP_VERSION="${PROJECT_VERSION}"
 )
-target_link_libraries(flatpak-app-installer PRIVATE
+target_link_libraries(flatpak-file-installer PRIVATE
     installer_core
     Qt6::Widgets
     Qt6::Qml
@@ -67,4 +67,4 @@ target_link_libraries(flatpak-app-installer PRIVATE
     KF6::CoreAddons
 )
 
-install(TARGETS flatpak-app-installer ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
+install(TARGETS flatpak-file-installer ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

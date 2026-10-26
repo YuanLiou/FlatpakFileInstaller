@@ -72,8 +72,8 @@ jobs:
       - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
         with:
           # The action adds the architecture to the artifact name itself.
-          bundle: FlatpakAppInstaller.flatpak
-          manifest-path: packaging/flatpak/io.github.yuanliou.FlatpakAppInstaller.yml
+          bundle: FlatpakFileInstaller.flatpak
+          manifest-path: packaging/flatpak/io.github.yuanliou.FlatpakFileInstaller.yml
           arch: ${{ matrix.arch }}
           cache-key: flatpak-builder-${{ matrix.arch }}-${{ github.sha }}
 

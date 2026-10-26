@@ -29,8 +29,8 @@ int main(int argc, char *argv[])
     QApplication app(argc, argv);
     KLocalizedString::setApplicationDomain(QByteArrayLiteral(TRANSLATION_DOMAIN));
 
-    KAboutData about(u"flatpak-app-installer"_s,
-                     i18n("Flatpak App Installer"),
+    KAboutData about(u"flatpak-file-installer"_s,
+                     i18n("Flatpak File Installer"),
                      QStringLiteral(APP_VERSION),
                      i18n("Install apps you downloaded from the internet"),
                      KAboutLicense::Apache_V2);
@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     KLocalization::setupLocalizedContext(&engine);
-    engine.loadFromModule("io.github.yuanliou.FlatpakAppInstaller", "Main");
+    engine.loadFromModule("io.github.yuanliou.FlatpakFileInstaller", "Main");
     if (engine.rootObjects().isEmpty()) {
         return 1;
     }

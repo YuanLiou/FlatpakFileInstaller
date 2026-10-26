@@ -4,12 +4,12 @@ import QtQuick.Controls as QQC2
 import QtQuick.Dialogs
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import io.github.yuanliou.FlatpakAppInstaller
+import io.github.yuanliou.FlatpakFileInstaller
 
 Kirigami.ApplicationWindow {
     id: root
 
-    title: Installer.state === Installer.State.Empty ? i18n("Flatpak App Installer") : i18n("Install “%1”", Installer.appName)
+    title: Installer.state === Installer.State.Empty ? i18n("Flatpak File Installer") : i18n("Install “%1”", Installer.appName)
     width: Kirigami.Units.gridUnit * 38
     height: Kirigami.Units.gridUnit * 36
     minimumWidth: Kirigami.Units.gridUnit * 30

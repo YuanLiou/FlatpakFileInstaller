@@ -1,12 +1,12 @@
-# Traditional Chinese (Taiwan) translation of Flatpak App Installer.
+# Traditional Chinese (Taiwan) translation of Flatpak File Installer.
 # SPDX-License-Identifier: Apache-2.0
 #
 # 翻譯原則：讀者是完全不懂 Linux 的人。用台灣日常用語，避免技術術語；
 # 「App」維持英文，與台灣手機與電腦介面的習慣一致。
 msgid ""
 msgstr ""
-"Project-Id-Version: flatpak-app-installer\n"
-"Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/issues\n"
+"Project-Id-Version: flatpak-file-installer\n"
+"Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/issues\n"
 "POT-Creation-Date: 2026-10-26 08:23+0000\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
@@ -17,39 +17,39 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in
+#: data/io.github.yuanliou.FlatpakFileInstaller.desktop.in
 msgid "App Installer"
 msgstr "App 安裝程式"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in
-#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in src/main.cpp
+#: data/io.github.yuanliou.FlatpakFileInstaller.desktop.in
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in src/main.cpp
 #: src/qml/Main.qml
 #, kde-format
-msgid "Flatpak App Installer"
-msgstr "Flatpak App 安裝程式"
+msgid "Flatpak File Installer"
+msgstr "Flatpak 檔案安裝程式"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in src/main.cpp
+#: data/io.github.yuanliou.FlatpakFileInstaller.desktop.in src/main.cpp
 #, kde-format
 msgid "Install apps you downloaded from the internet"
 msgstr "安裝你從網路下載的 App"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.desktop.in
+#: data/io.github.yuanliou.FlatpakFileInstaller.desktop.in
 msgid "flatpak;flathub;install;app;software;"
 msgstr "flatpak;flathub;install;app;software;安裝;應用程式;軟體;"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "Install downloaded apps by dragging them"
 msgstr "用拖曳的方式安裝下載的 App"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "Downloaded an app that ends in “.flatpak” or “.flatpakref”? Double-click it and drag the app to where you want to install it, just like on a Mac."
 msgstr "下載了檔名結尾是「.flatpak」或「.flatpakref」的 App 嗎？在檔案上按兩下，再把 App 拖到你想安裝的位置就好，跟在 Mac 上安裝一樣簡單。"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "Choose “Just for me” to install it only for yourself, or “Everyone on this computer” so that everybody who uses the computer can open it."
 msgstr "選「只給我用」就只有你能使用；選「給這台電腦的所有人」，每個使用這台電腦的人都能開啟。"
 
-#: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "First development version."
 msgstr "第一個開發版本。"
 

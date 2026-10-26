@@ -11,7 +11,7 @@ import org.kde.kirigami as Kirigami
 DropArea {
     id: target
 
-    readonly property string dragKey: "application/x-flatpak-app-installer"
+    readonly property string dragKey: "application/x-flatpak-file-installer"
 
     required property string title
     required property string description

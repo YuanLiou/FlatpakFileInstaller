@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: Apache-2.0
 #
-# Extracts user-visible text into po/flatpak-app-installer.pot and merges it
+# Extracts user-visible text into po/flatpak-file-installer.pot and merges it
 # into every po/<lang>.po listed in po/LINGUAS.
 #
 # Adding a language: add its code (e.g. "ja") to po/LINGUAS, run this
@@ -9,12 +9,12 @@
 set -eu
 
 cd "$(dirname "$0")/.."
-DOMAIN=flatpak-app-installer
+DOMAIN=flatpak-file-installer
 POT=po/$DOMAIN.pot
 
 KEYWORDS="--keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 --keyword=i18ncp:1c,2,3"
-VERSION=$(sed -n 's/^project(flatpak-app-installer VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
-COMMON="--from-code=UTF-8 --add-location=file --package-version=$VERSION --add-comments=TRANSLATORS --sort-by-file --package-name=$DOMAIN --msgid-bugs-address=https://github.com/YuanLiou/FlatpakAppInstaller/issues"
+VERSION=$(sed -n 's/^project(flatpak-file-installer VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+COMMON="--from-code=UTF-8 --add-location=file --package-version=$VERSION --add-comments=TRANSLATORS --sort-by-file --package-name=$DOMAIN --msgid-bugs-address=https://github.com/YuanLiou/FlatpakFileInstaller/issues"
 
 # shellcheck disable=SC2086
 xgettext $COMMON --language=C++ --kde $KEYWORDS -o "$POT" $(find src -name '*.cpp' | sort)

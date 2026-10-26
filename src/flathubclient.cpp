@@ -76,7 +76,7 @@ void FlathubClient::fetchMetadata(const PackageInfo &package, std::function<void
 {
     QNetworkRequest request(summaryUrl(package));
     request.setTransferTimeout(kTimeoutMs);
-    request.setHeader(QNetworkRequest::UserAgentHeader, u"flatpak-app-installer"_s);
+    request.setHeader(QNetworkRequest::UserAgentHeader, u"flatpak-file-installer"_s);
     QNetworkReply *reply = m_network->get(request);
     connect(reply, &QNetworkReply::finished, this, [reply, done] {
         reply->deleteLater();

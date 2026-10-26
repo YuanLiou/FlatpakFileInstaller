@@ -1,4 +1,4 @@
-# Flatpak App Installer
+# Flatpak File Installer
 
 讓完全不懂 Linux 的人，也能像在 Mac 上一樣安裝 App：在下載好的 `.flatpak` 或 `.flatpakref` 檔案上按兩下（或把檔案拖進視窗），再把 App 拖到「只給我用」或「給這台電腦的所有人」就好。安裝前會用白話說明 App 從哪裡來、可以存取哪些東西；已經裝過的話，會說明版本差在哪裡，讓使用者選擇開啟、更新或替換；缺少的元件（runtime）會自動從 Flathub 下載。
 
@@ -68,7 +68,7 @@ v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirem
 cmake -S . -B build -G Ninja
 cmake --build build
 QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
-./build/bin/flatpak-app-installer path/to/app.flatpak
+./build/bin/flatpak-file-installer path/to/app.flatpak
 ```
 
 `installtest` 會用真正的 `flatpak` 指令，把測試用的 App 裝進暫存目錄；沒有 `flatpak` 或 `busybox` 時會自動略過。
@@ -76,7 +76,7 @@ QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
 ### Flatpak
 
 ```sh
-flatpak-builder --user --install --force-clean build-flatpak packaging/flatpak/io.github.yuanliou.FlatpakAppInstaller.yml
+flatpak-builder --user --install --force-clean build-flatpak packaging/flatpak/io.github.yuanliou.FlatpakFileInstaller.yml
 ```
 
 ### AppImage

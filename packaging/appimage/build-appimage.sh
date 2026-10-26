@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: Apache-2.0
 #
-# Builds Flatpak_App_Installer-<version>-<arch>.AppImage for the machine's
+# Builds Flatpak_File_Installer-<version>-<arch>.AppImage for the machine's
 # architecture (x86_64 or aarch64). Needs the same Qt 6 / KF6 development
 # packages as a normal build; see .github/workflows/ci.yml for the list.
 #
@@ -11,8 +11,8 @@ set -eu
 ROOT=$(cd "$(dirname "$0")/../.." && pwd)
 WORK=$(mkdir -p "${1:-$ROOT/build-appimage}" && cd "${1:-$ROOT/build-appimage}" && pwd)
 ARCH=$(uname -m)
-APP_ID=io.github.yuanliou.FlatpakAppInstaller
-VERSION=$(sed -n 's/^project(flatpak-app-installer VERSION \([0-9.]*\).*/\1/p' "$ROOT/CMakeLists.txt")
+APP_ID=io.github.yuanliou.FlatpakFileInstaller
+VERSION=$(sed -n 's/^project(flatpak-file-installer VERSION \([0-9.]*\).*/\1/p' "$ROOT/CMakeLists.txt")
 
 LINUXDEPLOY_VERSION=1-alpha-20251107-1
 LINUXDEPLOY_QT_VERSION=1-alpha-20250213-1
@@ -48,7 +48,7 @@ export QMAKE="${QMAKE:-$(command -v qmake6 || echo /usr/lib/qt6/bin/qmake)}"
 export QML_SOURCES_PATHS="$ROOT/src/qml:$ROOT/packaging/appimage/qml"
 export EXTRA_QT_MODULES="svg;waylandclient"
 export EXTRA_PLATFORM_PLUGINS="libqwayland.so"
-export OUTPUT="Flatpak_App_Installer-$VERSION-$ARCH.AppImage"
+export OUTPUT="Flatpak_File_Installer-$VERSION-$ARCH.AppImage"
 
 cd "$WORK"
 PATH="$TOOLS:$PATH" "$TOOLS/linuxdeploy-$ARCH.AppImage" \
