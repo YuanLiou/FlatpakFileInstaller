@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 cmake_minimum_required(VERSION 3.22)
 
-project(flatpak-app-installer VERSION 0.1.0 LANGUAGES CXX)
+project(flatpak-file-installer VERSION 0.1.0 LANGUAGES CXX)
 
-set(APP_ID "io.github.yuanliou.FlatpakAppInstaller")
-set(TRANSLATION_DOMAIN "flatpak-app-installer")
+set(APP_ID "io.github.yuanliou.FlatpakFileInstaller")
+set(TRANSLATION_DOMAIN "flatpak-file-installer")
 
 set(QT_MIN_VERSION "6.8.0")
 set(KF_MIN_VERSION "6.9.0") # KAboutLicense::Apache_V2

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- SPDX-License-Identifier: CC0-1.0 -->
 <component type="desktop-application">
-  <id>io.github.yuanliou.FlatpakAppInstaller</id>
+  <id>io.github.yuanliou.FlatpakFileInstaller</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_license>Apache-2.0</project_license>
 
-  <name>Flatpak App Installer</name>
+  <name>Flatpak File Installer</name>
   <summary>Install downloaded apps by dragging them</summary>
   <description>
     <p>Downloaded an app that ends in “.flatpak” or “.flatpakref”? Double-click it and drag the app to where you want to install it, just like on a Mac.</p>
@@ -16,13 +16,13 @@
     <name translate="no">YuanLiou</name>
   </developer>
 
-  <launchable type="desktop-id">io.github.yuanliou.FlatpakAppInstaller.desktop</launchable>
-  <url type="homepage">https://github.com/YuanLiou/FlatpakAppInstaller</url>
-  <url type="bugtracker">https://github.com/YuanLiou/FlatpakAppInstaller/issues</url>
-  <url type="vcs-browser">https://github.com/YuanLiou/FlatpakAppInstaller</url>
+  <launchable type="desktop-id">io.github.yuanliou.FlatpakFileInstaller.desktop</launchable>
+  <url type="homepage">https://github.com/YuanLiou/FlatpakFileInstaller</url>
+  <url type="bugtracker">https://github.com/YuanLiou/FlatpakFileInstaller/issues</url>
+  <url type="vcs-browser">https://github.com/YuanLiou/FlatpakFileInstaller</url>
 
   <provides>
-    <binary>flatpak-app-installer</binary>
+    <binary>flatpak-file-installer</binary>
     <mediatype>application/vnd.flatpak</mediatype>
     <mediatype>application/vnd.flatpak.ref</mediatype>
   </provides>

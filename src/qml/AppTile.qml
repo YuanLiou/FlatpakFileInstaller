@@ -24,7 +24,7 @@ Item {
         scale: mouseArea.drag.active ? 1.08 : 1
 
         Drag.active: mouseArea.drag.active
-        Drag.keys: ["application/x-flatpak-app-installer"]
+        Drag.keys: ["application/x-flatpak-file-installer"]
         Drag.hotSpot.x: width / 2
         Drag.hotSpot.y: Kirigami.Units.iconSizes.enormous / 2
 

@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
-Name=Flatpak App Installer
+Name=Flatpak File Installer
 GenericName=App Installer
 Comment=Install apps you downloaded from the internet
 Keywords=flatpak;flathub;install;app;software;
-Exec=flatpak-app-installer %f
-Icon=io.github.yuanliou.FlatpakAppInstaller
+Exec=flatpak-file-installer %f
+Icon=io.github.yuanliou.FlatpakFileInstaller
 Terminal=false
 StartupNotify=true
 Categories=System;PackageManager;

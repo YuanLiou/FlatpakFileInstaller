@@ -5,7 +5,7 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Layouts
 import org.kde.kirigami as Kirigami
-import io.github.yuanliou.FlatpakAppInstaller
+import io.github.yuanliou.FlatpakFileInstaller
 
 // Where the app comes from and what it may access, shown before installing.
 // Things worth a second thought get a small orange mark, never red.

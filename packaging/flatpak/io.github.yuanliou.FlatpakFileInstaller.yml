@@ -3,11 +3,11 @@
 # Development manifest: builds the checked-out source tree.
 # The Flathub submission uses the same file with the `dir` source replaced
 # by a `git` source pinned to a release tag and commit.
-id: io.github.yuanliou.FlatpakAppInstaller
+id: io.github.yuanliou.FlatpakFileInstaller
 runtime: org.kde.Platform
 runtime-version: '6.10'
 sdk: org.kde.Sdk
-command: flatpak-app-installer
+command: flatpak-file-installer
 
 finish-args:
   - --share=ipc
@@ -30,7 +30,7 @@ cleanup:
   - /lib/pkgconfig
 
 modules:
-  - name: flatpak-app-installer
+  - name: flatpak-file-installer
     buildsystem: cmake-ninja
     config-opts:
       - -DCMAKE_BUILD_TYPE=Release

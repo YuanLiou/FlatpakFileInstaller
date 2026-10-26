@@ -1,4 +1,4 @@
-# Flatpak App Installer：需求紀錄
+# Flatpak File Installer：需求紀錄
 
 > 這份文件記錄已和產品負責人確認的需求，以及尚未決定的事項。技術驗證請見 [`spike/README.md`](../spike/README.md)。
 
@@ -68,7 +68,8 @@
 
 - 程式語言：C++20（UI 用 Qt 6 + Kirigami／QML）
 - 授權條款：Apache-2.0
-- App ID：`io.github.yuanliou.FlatpakAppInstaller`
+- 名稱：Flatpak File Installer（中文：Flatpak 檔案安裝程式）。第一次發布前由 Flatpak App Installer 改名，App ID 與 GitHub repo 名稱一起改，所以不需要 Flathub 的改名遷移。
+- App ID：`io.github.yuanliou.FlatpakFileInstaller`
 - 最低版本：Qt 6.8、KDE Frameworks 6.9；Flatpak 版使用 KDE runtime 6.10
 
 ## 實作進度（v0.1.0 骨架）
