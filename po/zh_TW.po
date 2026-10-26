@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: flatpak-file-installer\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 10:34+0000\n"
+"POT-Creation-Date: 2026-10-26 10:24+0000\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
@@ -59,23 +59,6 @@ msgstr ""
 "都能開啟。"
 
 #: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
-msgid "Drag the app to where you want to install it"
-msgstr "把 App 拖到你想安裝的位置"
-
-#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
-msgid "Choose what to do when the app is already installed"
-msgstr "App 已經裝過時，選擇接下來要怎麼做"
-
-#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
-msgid "Open the app right after installing it"
-msgstr "裝好後馬上就能開啟 App"
-
-#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
-msgid ""
-"Adds screenshots and colors for app stores. The app itself hasn't changed."
-msgstr "加入給 App 商店用的截圖和顏色，App 本身沒有改變。"
-
-#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "The first release."
 msgstr "第一個正式版本。"
 
@@ -83,9 +66,7 @@ msgstr "第一個正式版本。"
 msgid ""
 "Install “.flatpak” and “.flatpakref” files by dragging the app to “Just for "
 "me” or “Everyone on this computer”."
-msgstr ""
-"把 App 拖到「只給我用」或「給這台電腦的所有人」，就能安裝「.flatpak」和"
-"「.flatpakref」檔案。"
+msgstr "把 App 拖到「只給我用」或「給這台電腦的所有人」，就能安裝「.flatpak」和「.flatpakref」檔案。"
 
 #: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "See where an app comes from and what it can do before you install it."
