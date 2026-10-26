@@ -16,7 +16,7 @@ Install apps on Linux the way you would on a Mac, even if you know nothing about
 
 ## Status
 
-Version 1.0.0. For which requirements are done and which are still open, see [`docs/requirements.md`](docs/requirements.md) (in Traditional Chinese, see [About the documentation](#about-the-documentation)).
+Version 1.0.1. For which requirements are done and which are still open, see [`docs/requirements.md`](docs/requirements.md) (in Traditional Chinese, see [About the documentation](#about-the-documentation)).
 
 - "Just for me" runs `flatpak install --user`; "Everyone on this computer" runs `--system`.
 - Distributed as a Flatpak (aiming for Flathub) and as an AppImage, for x86_64 and aarch64.

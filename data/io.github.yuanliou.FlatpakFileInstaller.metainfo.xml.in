@@ -39,7 +39,32 @@
 
   <content_rating type="oars-1.1"/>
 
+  <branding>
+    <color type="primary" scheme_preference="light">#a6cbf5</color>
+    <color type="primary" scheme_preference="dark">#1b4b8a</color>
+  </branding>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Drag the app to where you want to install it</caption>
+      <image>https://raw.githubusercontent.com/YuanLiou/FlatpakFileInstaller/v1.0.1/docs/screenshots/en/ready.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Choose what to do when the app is already installed</caption>
+      <image>https://raw.githubusercontent.com/YuanLiou/FlatpakFileInstaller/v1.0.1/docs/screenshots/en/already-installed.png</image>
+    </screenshot>
+    <screenshot>
+      <caption>Open the app right after installing it</caption>
+      <image>https://raw.githubusercontent.com/YuanLiou/FlatpakFileInstaller/v1.0.1/docs/screenshots/en/installed.png</image>
+    </screenshot>
+  </screenshots>
+
   <releases>
+    <release version="1.0.1" date="2026-10-26">
+      <description>
+        <p>Adds screenshots and colors for app stores. The app itself hasn't changed.</p>
+      </description>
+    </release>
     <release version="1.0.0" date="2026-10-26">
       <description>
         <p>The first release.</p>

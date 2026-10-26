@@ -72,7 +72,7 @@
 - App ID：`io.github.yuanliou.FlatpakFileInstaller`
 - 最低版本：Qt 6.8、KDE Frameworks 6.9；Flatpak 版使用 KDE runtime 6.10
 
-## 實作進度（v1.0.0）
+## 實作進度（v1.0.1）
 
 | 需求 | 狀態 |
 |---|---|

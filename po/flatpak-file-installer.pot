@@ -6,10 +6,10 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: flatpak-file-installer 1.0.0\n"
+"Project-Id-Version: flatpak-file-installer 1.0.1\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 10:24+0000\n"
+"POT-Creation-Date: 2026-10-26 10:35+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,6 +52,23 @@ msgstr ""
 msgid ""
 "Choose “Just for me” to install it only for yourself, or “Everyone on this "
 "computer” so that everybody who uses the computer can open it."
+msgstr ""
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid "Drag the app to where you want to install it"
+msgstr ""
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid "Choose what to do when the app is already installed"
+msgstr ""
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid "Open the app right after installing it"
+msgstr ""
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid ""
+"Adds screenshots and colors for app stores. The app itself hasn't changed."
 msgstr ""
 
 #: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in

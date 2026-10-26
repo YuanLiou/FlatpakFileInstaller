@@ -3,7 +3,7 @@
 <!-- Which parts of an AppStream metainfo file get translated. -->
 <its:rules xmlns:its="http://www.w3.org/2005/11/its" version="2.0">
   <its:translateRule selector="/component" translate="no"/>
-  <its:translateRule selector="/component/name | /component/summary | /component/description | /component/releases/release/description" translate="yes"/>
+  <its:translateRule selector="/component/name | /component/summary | /component/description | /component/releases/release/description | /component/screenshots/screenshot/caption" translate="yes"/>
   <its:translateRule selector="//*[@translate = 'no']" translate="no"/>
   <its:withinTextRule selector="/component/description/*/em | /component/description/*/code" withinText="yes"/>
 </its:rules>
