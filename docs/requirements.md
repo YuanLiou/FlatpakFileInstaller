@@ -27,7 +27,7 @@
 ## 由需求推導出的技術方向
 
 - **安裝一律透過主機上的 `flatpak` 指令**：Flatpak 版用 `flatpak-spawn --host flatpak ...`（需要 `--talk-name=org.freedesktop.Flatpak`，與 Flathub 上的 Warehouse 相同）；AppImage 版直接執行 `flatpak`。不把 libflatpak 打包進來執行安裝。
-- **UI 框架**：因為專注 KDE，採用 Qt 6 + Kirigami（KDE 官方 UI 框架，KDE Flatpak runtime 內建）。
+- **語言與 UI 框架**：C++；因為專注 KDE，UI 採用 Qt 6 + Kirigami（KDE 官方 UI 框架，KDE Flatpak runtime 內建）。
 - **不可變系統**：不能安裝 rpm／修改 `/usr`，所以 app 本身只能是 Flatpak 或 AppImage（已符合）。`/var/lib/flatpak` 與 `~/.local/share/flatpak` 仍可寫入。
 - **多國語言**：以 gettext 流程（`po/` 目錄、`.pot` 範本）管理 UI、`.desktop`、AppStream metainfo 的翻譯；原始字串用英文，第一個翻譯是 `zh_TW`。
 
@@ -62,5 +62,5 @@
 
 ## 尚未決定
 
-- [ ] 程式語言：C++ 或 Rust（兩者 UI 都用 Qt 6 + Kirigami／QML）
+- [x] 程式語言：C++（UI 用 Qt 6 + Kirigami／QML）
 - [ ] 授權條款
