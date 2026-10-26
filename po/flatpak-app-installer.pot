@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: flatpak-app-installer 0.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 07:44+0000\n"
+"POT-Creation-Date: 2026-10-26 08:23+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,6 +80,11 @@ msgstr ""
 #: src/installer.cpp
 #, kde-format
 msgid "“%1” couldn't be installed."
+msgstr ""
+
+#: src/installer.cpp
+#, kde-format
+msgid "“%1” couldn't be updated."
 msgstr ""
 
 #: src/main.cpp
@@ -319,6 +324,10 @@ msgid "“%1”"
 msgstr ""
 
 #: src/qml/Main.qml
+msgid "A newer version is available."
+msgstr ""
+
+#: src/qml/Main.qml
 msgid ""
 "Ask the person who manages this computer to install Flatpak, or see "
 "flatpak.org/setup for instructions."
@@ -326,6 +335,10 @@ msgstr ""
 
 #: src/qml/Main.qml
 msgid "By %1"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Check for Updates"
 msgstr ""
 
 #: src/qml/Main.qml
@@ -382,6 +395,10 @@ msgid "Hide Details"
 msgstr ""
 
 #: src/qml/Main.qml
+msgid "Install Again"
+msgstr ""
+
+#: src/qml/Main.qml
 msgid "Install an app"
 msgstr ""
 
@@ -391,6 +408,14 @@ msgstr ""
 
 #: src/qml/Main.qml
 msgid "Installing “%1”…"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "It's installed for everyone on this computer."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "It's installed just for you."
 msgstr ""
 
 #: src/qml/Main.qml
@@ -406,7 +431,15 @@ msgid "Needs %1 of space"
 msgstr ""
 
 #: src/qml/Main.qml
+msgid "Only someone who manages this computer can change it."
+msgstr ""
+
+#: src/qml/Main.qml
 msgid "Only you can use it. No password needed."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Open the Current Version"
 msgstr ""
 
 #: src/qml/Main.qml
@@ -426,9 +459,25 @@ msgid "Show Details"
 msgstr ""
 
 #: src/qml/Main.qml
+msgid "Switch to This Older Version"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Switch to This Version"
+msgstr ""
+
+#: src/qml/Main.qml
 msgid ""
 "This app needs some extra parts from the internet, so this may take a while. "
 "Please keep this window open."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "This file has a different version from the one you have."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "This file has a newer version (%1) than the one you have (%2)."
 msgstr ""
 
 #: src/qml/Main.qml
@@ -440,7 +489,39 @@ msgid "Try Again"
 msgstr ""
 
 #: src/qml/Main.qml
+msgid "Update"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Update to This Version"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Updating “%1”…"
+msgstr ""
+
+#: src/qml/Main.qml
 msgid "Version %1"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "You already have a newer version (%1). This file has an older one (%2)."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "You already have the newest version."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "You already have this same version (%1)."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "You already have this same version."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "You can check whether there's a newer version."
 msgstr ""
 
 #: src/qml/Main.qml
@@ -448,7 +529,23 @@ msgid "You can now find it in your app menu."
 msgstr ""
 
 #: src/qml/Main.qml
+msgid "Your settings and files in the app will be kept."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "“%1” is already on this computer"
+msgstr ""
+
+#: src/qml/Main.qml
 msgid "“%1” is installed"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "“%1” is up to date"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "“%1” is updated"
 msgstr ""
 
 #: src/qml/PermissionsCard.qml

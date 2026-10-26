@@ -36,6 +36,8 @@ private Q_SLOTS:
         QCOMPARE(info.runtimeRepoUrl, u"https://dl.flathub.org/repo/flathub.flatpakrepo"_s);
         QCOMPARE(info.icon.size(), QSize(64, 64));
         QVERIFY(info.installedSize > 0);
+        // What `flatpak list --columns=active` shows once it is installed.
+        QCOMPARE(info.commit, u"f6b8ec462e0d574c08c130161cb2f035130c93d6394a3bfea044f3010c390297"_s);
     }
 
     void bundlePicksPreferredLanguage()

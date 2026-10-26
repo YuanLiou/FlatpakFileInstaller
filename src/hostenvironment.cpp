@@ -116,6 +116,11 @@ QStringList systemInstallActions(const PackageInfo &package, const InstallationS
     return actions;
 }
 
+QStringList systemUpdateActions(const PackageInfo &package)
+{
+    return {package.kind == PackageInfo::Kind::Runtime ? u"org.freedesktop.Flatpak.runtime-update"_s : u"org.freedesktop.Flatpak.app-update"_s};
+}
+
 QString remoteNameForUrl(const QString &remoteUrl, const QByteArray &remotesOutput)
 {
     if (remoteUrl.trimmed().isEmpty()) {

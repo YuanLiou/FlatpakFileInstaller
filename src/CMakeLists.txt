@@ -2,6 +2,7 @@
 
 # Everything that doesn't need a GUI, so tests can link it.
 add_library(installer_core STATIC
+    existinginstall.cpp
     flathubclient.cpp
     flatpakcli.cpp
     hostcommand.cpp

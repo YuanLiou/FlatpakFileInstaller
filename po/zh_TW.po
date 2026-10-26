@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flatpak-app-installer\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/issues\n"
-"POT-Creation-Date: 2026-10-26 07:43+0000\n"
+"POT-Creation-Date: 2026-10-26 08:23+0000\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
@@ -72,6 +72,11 @@ msgstr "這個檔案不是可以在這裡安裝的 App。請找檔名結尾是�
 #, kde-format
 msgid "“%1” couldn't be installed."
 msgstr "「%1」沒有安裝成功。"
+
+#: src/installer.cpp
+#, kde-format
+msgid "“%1” couldn't be updated."
+msgstr "「%1」沒有更新成功。"
 
 #: src/main.cpp
 #, kde-format
@@ -305,12 +310,20 @@ msgid "“%1”"
 msgstr "「%1」"
 
 #: src/qml/Main.qml
+msgid "A newer version is available."
+msgstr "有新版本可以更新。"
+
+#: src/qml/Main.qml
 msgid "Ask the person who manages this computer to install Flatpak, or see flatpak.org/setup for instructions."
 msgstr "請管理這台電腦的人幫忙安裝 Flatpak，或到 flatpak.org/setup 查看安裝說明。"
 
 #: src/qml/Main.qml
 msgid "By %1"
 msgstr "開發者：%1"
+
+#: src/qml/Main.qml
+msgid "Check for Updates"
+msgstr "檢查更新"
 
 #: src/qml/Main.qml
 msgid "Choose Another File…"
@@ -362,6 +375,10 @@ msgid "Hide Details"
 msgstr "隱藏詳細資訊"
 
 #: src/qml/Main.qml
+msgid "Install Again"
+msgstr "重新安裝"
+
+#: src/qml/Main.qml
 msgid "Install an app"
 msgstr "安裝 App"
 
@@ -372,6 +389,14 @@ msgstr "安裝「%1」"
 #: src/qml/Main.qml
 msgid "Installing “%1”…"
 msgstr "正在安裝「%1」…"
+
+#: src/qml/Main.qml
+msgid "It's installed for everyone on this computer."
+msgstr "目前是安裝給這台電腦的所有人。"
+
+#: src/qml/Main.qml
+msgid "It's installed just for you."
+msgstr "目前是安裝成只給你用。"
 
 #: src/qml/Main.qml
 msgid "Just for me"
@@ -386,8 +411,16 @@ msgid "Needs %1 of space"
 msgstr "需要 %1 的空間"
 
 #: src/qml/Main.qml
+msgid "Only someone who manages this computer can change it."
+msgstr "只有管理這台電腦的人可以變更它。"
+
+#: src/qml/Main.qml
 msgid "Only you can use it. No password needed."
 msgstr "只有你能使用，不需要輸入密碼。"
+
+#: src/qml/Main.qml
+msgid "Open the Current Version"
+msgstr "開啟目前的版本"
 
 #: src/qml/Main.qml
 msgid "Open “%1”"
@@ -406,8 +439,24 @@ msgid "Show Details"
 msgstr "顯示詳細資訊"
 
 #: src/qml/Main.qml
+msgid "Switch to This Older Version"
+msgstr "換成這個舊版本"
+
+#: src/qml/Main.qml
+msgid "Switch to This Version"
+msgstr "換成這個版本"
+
+#: src/qml/Main.qml
 msgid "This app needs some extra parts from the internet, so this may take a while. Please keep this window open."
 msgstr "這個 App 還需要從網路下載一些額外的元件，可能會花比較久的時間，請不要關閉這個視窗。"
+
+#: src/qml/Main.qml
+msgid "This file has a different version from the one you have."
+msgstr "這個檔案和你現在用的是不同的版本。"
+
+#: src/qml/Main.qml
+msgid "This file has a newer version (%1) than the one you have (%2)."
+msgstr "這個檔案是比較新的版本（%1），你現在用的是 %2。"
 
 #: src/qml/Main.qml
 msgid "This may take a few minutes. Please keep this window open."
@@ -418,16 +467,64 @@ msgid "Try Again"
 msgstr "再試一次"
 
 #: src/qml/Main.qml
+msgid "Update"
+msgstr "更新"
+
+#: src/qml/Main.qml
+msgid "Update to This Version"
+msgstr "更新到這個版本"
+
+#: src/qml/Main.qml
+msgid "Updating “%1”…"
+msgstr "正在更新「%1」…"
+
+#: src/qml/Main.qml
 msgid "Version %1"
 msgstr "版本 %1"
+
+#: src/qml/Main.qml
+msgid "You already have a newer version (%1). This file has an older one (%2)."
+msgstr "你已經有比較新的版本（%1），這個檔案是比較舊的版本（%2）。"
+
+#: src/qml/Main.qml
+msgid "You already have the newest version."
+msgstr "你已經有最新的版本了。"
+
+#: src/qml/Main.qml
+msgid "You already have this same version (%1)."
+msgstr "你已經有同一個版本（%1）了。"
+
+#: src/qml/Main.qml
+msgid "You already have this same version."
+msgstr "你已經有同一個版本了。"
+
+#: src/qml/Main.qml
+msgid "You can check whether there's a newer version."
+msgstr "可以檢查看看有沒有新版本。"
 
 #: src/qml/Main.qml
 msgid "You can now find it in your app menu."
 msgstr "現在可以在應用程式選單裡找到它了。"
 
 #: src/qml/Main.qml
+msgid "Your settings and files in the app will be kept."
+msgstr "App 裡的設定和資料都會保留。"
+
+#: src/qml/Main.qml
+msgid "“%1” is already on this computer"
+msgstr "「%1」已經在這台電腦上了"
+
+#: src/qml/Main.qml
 msgid "“%1” is installed"
 msgstr "「%1」安裝好了"
+
+#: src/qml/Main.qml
+msgid "“%1” is up to date"
+msgstr "「%1」已經是最新版本了"
+
+#: src/qml/Main.qml
+msgid "“%1” is updated"
+msgstr "「%1」更新好了"
 
 #: src/qml/PermissionsCard.qml
 msgid "Many good apps need this kind of access. Just make sure you trust this one."

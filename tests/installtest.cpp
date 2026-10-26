@@ -2,6 +2,7 @@
 //
 // Installs the test bundle with the real `flatpak` command into a throwaway
 // user installation. Skipped when flatpak or busybox isn't available.
+#include "existinginstall.h"
 #include "flatpakcli.h"
 #include "hostcommand.h"
 #include "hostenvironment.h"
@@ -120,6 +121,45 @@ private Q_SLOTS:
         const QList<Permissions::Permission> permissions = Permissions::fromMetadata(info->readAllStandardOutput());
         QCOMPARE(permissions.size(), 3);
         QCOMPARE(permissions.at(0).kind, Permissions::Kind::HomeFolder);
+    }
+
+    // The checks and actions Installer runs when the app is already there.
+    void handlesExistingInstalls()
+    {
+        const QString installation = u"existing"_s;
+        PackageInfo runtime;
+        runtime.format = PackageInfo::Format::Bundle;
+        QCOMPARE(flatpak(FlatpakCli::installArguments(runtime, m_dir.filePath(u"runtime.flatpak"_s), false), installation)->exitCode(), 0);
+
+        const QString bundle = m_dir.filePath(u"notes-offline.flatpak"_s);
+        const auto result = PackageFile::load(bundle, {});
+        QVERIFY(result.info);
+        const PackageInfo &package = *result.info;
+
+        const auto list = [&] {
+            return flatpak(FlatpakCli::listArguments(package.kind, false), installation)->readAllStandardOutput();
+        };
+        QVERIFY(!ExistingInstall::findInList(package, list(), false));
+        QCOMPARE(flatpak(FlatpakCli::installArguments(package, bundle, false), installation)->exitCode(), 0);
+
+        const auto found = ExistingInstall::findInList(package, list(), false);
+        QVERIFY(found);
+        QCOMPARE(found->version, u"1.2.3"_s);
+        QCOMPARE(ExistingInstall::compare(package, *found), ExistingInstall::Comparison::SameVersion);
+
+        // Installing over it fails; reinstalling works.
+        QVERIFY(flatpak(FlatpakCli::installArguments(package, bundle, false), installation)->exitCode() != 0);
+        QProcess *reinstall = flatpak(FlatpakCli::installArguments(package, bundle, false, true), installation);
+        QVERIFY2(reinstall->exitCode() == 0, reinstall->readAllStandardError().constData());
+
+        // Same app from the remote: the remote's newest build is the installed one.
+        QCOMPARE(flatpak(FlatpakCli::addRemoteArguments(u"testhub"_s, m_dir.filePath(u"hub.flatpakrepo"_s), false), installation)->exitCode(), 0);
+        const auto ref = PackageFile::load(m_dir.filePath(u"notes-hub.flatpakref"_s), {});
+        QVERIFY(ref.info);
+        QProcess *latest = flatpak(FlatpakCli::remoteCommitArguments(u"testhub"_s, *ref.info, false), installation);
+        QVERIFY2(latest->exitCode() == 0, latest->readAllStandardError().constData());
+        const QString latestCommit = QString::fromUtf8(latest->readAllStandardOutput()).trimmed();
+        QCOMPARE(ExistingInstall::compare(*ref.info, *found, latestCommit), ExistingInstall::Comparison::UpToDate);
     }
 
     // A user install can use a runtime that is only installed system-wide,

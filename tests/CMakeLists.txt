@@ -7,6 +7,7 @@ ecm_add_tests(
     hostcommandtest.cpp
     permissionstest.cpp
     flathubclienttest.cpp
+    existinginstalltest.cpp
     LINK_LIBRARIES installer_core Qt6::Test
 )
 

@@ -64,6 +64,24 @@ private Q_SLOTS:
                  (QStringList{u"install"_s, u"--system"_s, u"--noninteractive"_s, u"--assumeyes"_s, u"--from"_s, u"/tmp/app.flatpakref"_s}));
     }
 
+    void existingInstallArguments()
+    {
+        PackageInfo bundle;
+        bundle.format = PackageInfo::Format::Bundle;
+        QCOMPARE(FlatpakCli::installArguments(bundle, u"/tmp/app.flatpak"_s, false, true),
+                 (QStringList{u"install"_s, u"--user"_s, u"--noninteractive"_s, u"--assumeyes"_s, u"--reinstall"_s, u"--bundle"_s, u"/tmp/app.flatpak"_s}));
+        QCOMPARE(FlatpakCli::updateArguments(u"org.example.Notes"_s, u"stable"_s, true),
+                 (QStringList{u"update"_s, u"--system"_s, u"--noninteractive"_s, u"--assumeyes"_s, u"org.example.Notes//stable"_s}));
+        QCOMPARE(FlatpakCli::listArguments(PackageInfo::Kind::App, false),
+                 (QStringList{u"list"_s, u"--user"_s, u"--app"_s, u"--columns=application,branch,arch,version,active"_s}));
+        QCOMPARE(FlatpakCli::listArguments(PackageInfo::Kind::Runtime, true).at(2), u"--runtime"_s);
+        PackageInfo app;
+        app.id = u"org.example.Notes"_s;
+        app.branch = u"stable"_s;
+        QCOMPARE(FlatpakCli::remoteCommitArguments(u"flathub"_s, app, false),
+                 (QStringList{u"remote-info"_s, u"--user"_s, u"--show-commit"_s, u"flathub"_s, u"org.example.Notes//stable"_s}));
+    }
+
     void remoteArguments()
     {
         QCOMPARE(FlatpakCli::addRemoteArguments(FlatpakCli::flathubRemoteName(), FlatpakCli::flathubRepoFile(), false),

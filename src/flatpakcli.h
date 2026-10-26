@@ -16,7 +16,18 @@ QString flathubRepoFile();
 QString flathubRemoteName();
 
 // Installs the bundle or ref at `path` for the current user or system-wide.
-QStringList installArguments(const PackageInfo &package, const QString &path, bool forEveryone);
+// `reinstall` replaces a copy that is already installed (bundles only).
+QStringList installArguments(const PackageInfo &package, const QString &path, bool forEveryone, bool reinstall = false);
+
+// Updates an installed app from its remote.
+QStringList updateArguments(const QString &id, const QString &branch, bool forEveryone);
+
+// Lists installed apps (or runtimes) as
+// "application<TAB>branch<TAB>arch<TAB>version<TAB>active-commit" lines.
+QStringList listArguments(PackageInfo::Kind kind, bool forEveryone);
+
+// Prints just the latest commit of `package` in `remote`.
+QStringList remoteCommitArguments(const QString &remote, const PackageInfo &package, bool forEveryone);
 
 // Starts an installed app.
 QStringList runArguments(const PackageInfo &package, bool forEveryone);
