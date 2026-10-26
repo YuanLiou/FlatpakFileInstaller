@@ -19,6 +19,7 @@
 | P7 | 語言 | 先做台灣正體中文（`zh_TW`），但多國語言的架構要先備妥 |
 | P8 | 操作方式 | **只能拖曳**（不提供點選按鈕替代） |
 | P9 | 無法安裝到系統時 | 程式自行判斷；判斷為裝不了時，直接**隱藏**「系統」這個拖放目標，只留「使用者」 |
+| P10 | 把檔案拖進視窗 | 從檔案管理員或瀏覽器把 `.flatpak`／`.flatpakref` 拖到視窗裡，就開啟該檔案的安裝畫面 |
 | T1 | 發布方式 | 只提供 Flatpak（上架 Flathub）與 AppImage 兩種 |
 | T2 | CPU 架構 | x86_64 與 aarch64（ARM64） |
 | T3 | 桌面環境 | 專注 KDE Plasma |
@@ -39,6 +40,7 @@
 4. **AppImage 與 FUSE**：舊版 AppImage runtime 需要主機有 libfuse2；應使用新版靜態連結的 type2 runtime。尚未在 Fedora 44 Atomic／SteamOS 上實測。
 5. **只能拖曳的無障礙限制**：只用鍵盤或輔助工具的使用者無法完成安裝。這是已確認的產品決定，在此記錄其影響。
 6. **帶有 `runtime-repo` 的 bundle 離線裝不起來**：實測 flatpak 每次安裝這類 bundle 都會去下載 `.flatpakrepo`，即使 runtime 已經裝好也一樣，沒有網路就會失敗。目前的錯誤訊息會請使用者檢查網路連線。
+7. **`--filesystem=xdg-download:ro`**：Flatpak 版多要了「下載」資料夾的唯讀權限，作為拖放時的備援（見 P10）。送審 Flathub 時需要說明理由。
 
 ## 判斷能否安裝到系統（P9）
 
@@ -74,9 +76,31 @@
 |---|---|
 | P1 `.flatpak`／`.flatpakref` | ✅ 解析與安裝 |
 | P2 白話文字 | ✅ 所有畫面 |
-| P3 缺少 runtime 自動補 | ⏳ 未做；目前只靠 bundle 內的 `runtime-repo` |
+| P3 缺少 runtime 自動補 | ✅ 見下方「缺少 runtime 時（P3）」；離線無法驗證真正的 Flathub，以本機 repository 代替測試 |
 | P4 權限與來源警告 | ⏳ 未做；bundle 內的 metadata 已帶有權限資料，還沒解析 |
 | P5 已安裝過的選單 | ⏳ 未做 |
 | P7 多國語言架構 + `zh_TW` | ✅ |
 | P8 只能拖曳 | ✅ |
 | P9 判斷並隱藏「系統」 | ✅ 邏輯與單元測試；尚未在 Fedora 44／SteamOS 實機驗證 |
+| P10 把檔案拖進視窗 | ✅ 在 X11 上實測；Flatpak sandbox 內的 portal 路徑尚未在實機驗證 |
+
+## 缺少 runtime 時（P3）
+
+開啟 bundle 時，分別檢查「使用者」與「系統」兩個安裝位置：
+
+1. `flatpak info --user|--system <runtime>`：runtime 有沒有裝。裝在系統的 runtime，使用者層級的 App 也能用（已用測試確認）。
+2. `flatpak remotes --user|--system --columns=url`：Flathub 有沒有設定。
+
+安裝時，如果 runtime 不在、Flathub 也沒設定，而且 bundle 沒有自帶 `runtime-repo`，就先執行
+`flatpak remote-add --user|--system --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo`，
+再照常安裝；flatpak 會自動從 Flathub 下載缺少的 runtime（已用本機 repository 代替 Flathub 測試）。
+bundle 自帶 `runtime-repo` 時，flatpak 會自己加入那個 repository，不需要我們處理。
+
+需要下載 runtime 時，安裝中的畫面會說明「還需要從網路下載一些額外的元件」。
+
+## 把檔案拖進視窗（P10）
+
+- 視窗背後有一個 C++ 的 `FileDropArea`。拖進來的東西如果有 `.flatpak`／`.flatpakref` 檔名才接受，並顯示「放開就可以安裝這個 App」；其他檔案不接受。
+- 放開時用 KCoreAddons 的 `KUrlMimeData::urlsFromMimeData()` 解讀，在 sandbox 裡會透過 FileTransfer portal 換成 App 讀得到的路徑（Dolphin 等 KDE 程式支援）。
+- 瀏覽器的下載清單通常只給一般路徑，所以 Flatpak 版另外要了「下載」資料夾的唯讀權限。
+- 安裝或檢查中不接受拖放；其他時候拖進新檔案會換掉目前的檔案。

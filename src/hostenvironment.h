@@ -38,8 +38,20 @@ enum class Authorization {
 
 Authorization authorizationFromPkcheck(int exitCode, bool ranNormally);
 
+// What one installation (the user's or the system's) already has.
+struct InstallationState {
+    bool runtimeInstalled = true; // the app's runtime can be used from it
+    bool flathubConfigured = false;
+    bool remoteConfigured = false; // the .flatpakref's own remote
+};
+
+// Whether to add Flathub before installing, so that flatpak can download
+// a runtime the bundle needs. Bundles with a runtime-repo URL don't need
+// this: flatpak adds that repository by itself.
+bool needsFlathub(const PackageInfo &package, const InstallationState &state);
+
 // polkit actions flatpak's system helper checks for this install.
-QStringList systemInstallActions(const PackageInfo &package, bool remoteAlreadyConfigured);
+QStringList systemInstallActions(const PackageInfo &package, const InstallationState &system);
 
 // Whether `remoteUrl` is one of the configured remotes' URLs
 // (output of `flatpak remotes --system --columns=url`).

@@ -17,6 +17,14 @@ Kirigami.ApplicationWindow {
 
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
     pageStack.initialPage: Kirigami.Page {
+        // A file dragged onto the window opens it, whatever is showing.
+        FileDropArea {
+            id: fileDrop
+            anchors.fill: parent
+            enabled: !Installer.busy
+            onFileDropped: file => Installer.open(file)
+        }
+
         Loader {
             anchors.fill: parent
             sourceComponent: {
@@ -40,6 +48,22 @@ Kirigami.ApplicationWindow {
                 return emptyView;
             }
         }
+
+        Rectangle {
+            anchors.fill: parent
+            visible: fileDrop.containsDrag
+            radius: Kirigami.Units.cornerRadius
+            color: Kirigami.Theme.backgroundColor
+            border.width: 2
+            border.color: Kirigami.Theme.highlightColor
+
+            Kirigami.PlaceholderMessage {
+                anchors.centerIn: parent
+                width: parent.width - Kirigami.Units.gridUnit * 4
+                icon.source: "qrc:/icons/app.svg"
+                text: i18n("Let go to install this app")
+            }
+        }
     }
 
     onClosing: close => {
@@ -60,7 +84,7 @@ Kirigami.ApplicationWindow {
         Kirigami.PlaceholderMessage {
             icon.source: "qrc:/icons/app.svg"
             text: i18n("Install an app")
-            explanation: i18n("Double-click an app you downloaded (a file ending in “.flatpak” or “.flatpakref”), or choose one here.")
+            explanation: i18n("Double-click an app you downloaded (a file ending in “.flatpak” or “.flatpakref”), drag it onto this window, or choose one here.")
             helpfulAction: Kirigami.Action {
                 text: i18n("Choose File…")
                 onTriggered: fileDialog.open()
@@ -176,7 +200,9 @@ Kirigami.ApplicationWindow {
         id: installingView
         Kirigami.LoadingPlaceholder {
             text: i18n("Installing “%1”…", Installer.appName)
-            explanation: i18n("This may take a few minutes. Please keep this window open.")
+            explanation: Installer.downloadsExtras
+                ? i18n("This app needs some extra parts from the internet, so this may take a while. Please keep this window open.")
+                : i18n("This may take a few minutes. Please keep this window open.")
         }
     }
 

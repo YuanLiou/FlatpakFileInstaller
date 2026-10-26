@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: flatpak-app-installer\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 07:02+0000\n"
+"POT-Creation-Date: 2026-10-26 07:19+0000\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
@@ -123,10 +123,8 @@ msgstr "完成"
 #: src/qml/Main.qml
 msgid ""
 "Double-click an app you downloaded (a file ending in “.flatpak” or "
-"“.flatpakref”), or choose one here."
-msgstr ""
-"在下載好的 App 檔案（檔名結尾是「.flatpak」或「.flatpakref」）上按兩下，或是"
-"在這裡選擇檔案。"
+"“.flatpakref”), drag it onto this window, or choose one here."
+msgstr "在下載好的 App 檔案（檔名結尾是「.flatpak」或「.flatpakref」）上按兩下、把它拖到這個視窗，或是在這裡選擇檔案。"
 
 #: src/qml/Main.qml
 msgid "Drag the app onto where you want to install it."
@@ -176,6 +174,10 @@ msgid "Just for me"
 msgstr "只給我用"
 
 #: src/qml/Main.qml
+msgid "Let go to install this app"
+msgstr "放開就可以安裝這個 App"
+
+#: src/qml/Main.qml
 msgid "Needs %1 of space"
 msgstr "需要 %1 的空間"
 
@@ -198,6 +200,12 @@ msgstr "請等安裝完成後再關閉。"
 #: src/qml/Main.qml
 msgid "Show Details"
 msgstr "顯示詳細資訊"
+
+#: src/qml/Main.qml
+msgid ""
+"This app needs some extra parts from the internet, so this may take a while. "
+"Please keep this window open."
+msgstr "這個 App 還需要從網路下載一些額外的元件，可能會花比較久的時間，請不要關閉這個視窗。"
 
 #: src/qml/Main.qml
 msgid "This may take a few minutes. Please keep this window open."

@@ -35,6 +35,8 @@ class Installer : public QObject
     Q_PROPERTY(bool canLaunch READ canLaunch NOTIFY packageChanged)
     Q_PROPERTY(bool systemAvailable READ isSystemAvailable NOTIFY stateChanged)
     Q_PROPERTY(bool installedForEveryone READ isInstalledForEveryone NOTIFY stateChanged)
+    // The install also downloads a runtime the app needs, so it takes longer.
+    Q_PROPERTY(bool downloadsExtras READ downloadsExtras NOTIFY stateChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY stateChanged)
     Q_PROPERTY(QString errorDetails READ errorDetails NOTIFY stateChanged)
 
@@ -70,6 +72,7 @@ public:
     bool canLaunch() const;
     bool isSystemAvailable() const;
     bool isInstalledForEveryone() const;
+    bool downloadsExtras() const;
     QString errorMessage() const;
     QString errorDetails() const;
 
@@ -94,15 +97,22 @@ private:
     void runOnHost(const QString &program, const QStringList &arguments, Callback done);
     void setState(State state);
     void fail(State state, const QString &message, const QString &details = {});
-    void checkSystemInstall();
+    void checkInstallations();
+    void checkRuntime();
+    void checkRemotes();
     void checkAuthorizations(QStringList actions, QList<HostEnvironment::Authorization> results);
+    void runInstall(bool forEveryone);
+    void failInstall(const Output &output);
 
     State m_state = State::Empty;
     PackageInfo m_package;
     QString m_path;
     bool m_hasSystemInstallation = false;
+    HostEnvironment::InstallationState m_userState;
+    HostEnvironment::InstallationState m_systemState;
     bool m_systemAvailable = false;
     bool m_installedForEveryone = false;
+    bool m_downloadsExtras = false;
     QString m_errorMessage;
     QString m_errorDetails;
     quint64 m_generation = 0; // ignores results of checks for a previous file

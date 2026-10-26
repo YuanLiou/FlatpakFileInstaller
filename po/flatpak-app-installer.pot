@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: flatpak-app-installer 0.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 07:06+0000\n"
+"POT-Creation-Date: 2026-10-26 07:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -116,7 +116,7 @@ msgstr ""
 #: src/qml/Main.qml
 msgid ""
 "Double-click an app you downloaded (a file ending in “.flatpak” or "
-"“.flatpakref”), or choose one here."
+"“.flatpakref”), drag it onto this window, or choose one here."
 msgstr ""
 
 #: src/qml/Main.qml
@@ -167,6 +167,10 @@ msgid "Just for me"
 msgstr ""
 
 #: src/qml/Main.qml
+msgid "Let go to install this app"
+msgstr ""
+
+#: src/qml/Main.qml
 msgid "Needs %1 of space"
 msgstr ""
 
@@ -188,6 +192,12 @@ msgstr ""
 
 #: src/qml/Main.qml
 msgid "Show Details"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid ""
+"This app needs some extra parts from the internet, so this may take a while. "
+"Please keep this window open."
 msgstr ""
 
 #: src/qml/Main.qml

@@ -88,13 +88,26 @@ Authorization authorizationFromPkcheck(int exitCode, bool ranNormally)
     }
 }
 
-QStringList systemInstallActions(const PackageInfo &package, bool remoteAlreadyConfigured)
+bool needsFlathub(const PackageInfo &package, const InstallationState &state)
 {
-    if (package.format == PackageInfo::Format::Bundle) {
-        return {u"org.freedesktop.Flatpak.install-bundle"_s};
-    }
+    return package.format == PackageInfo::Format::Bundle && package.kind == PackageInfo::Kind::App && !package.runtime.isEmpty()
+        && package.runtimeRepoUrl.isEmpty() && !state.runtimeInstalled && !state.flathubConfigured;
+}
+
+QStringList systemInstallActions(const PackageInfo &package, const InstallationState &system)
+{
     QStringList actions;
-    if (!remoteAlreadyConfigured) {
+    if (package.format == PackageInfo::Format::Bundle) {
+        actions.append(u"org.freedesktop.Flatpak.install-bundle"_s);
+        if (!system.runtimeInstalled) {
+            actions.append(u"org.freedesktop.Flatpak.runtime-install"_s);
+            if (!system.flathubConfigured) {
+                actions.append(u"org.freedesktop.Flatpak.configure-remote"_s);
+            }
+        }
+        return actions;
+    }
+    if (!system.remoteConfigured) {
         actions.append(u"org.freedesktop.Flatpak.configure-remote"_s);
     }
     actions.append(package.kind == PackageInfo::Kind::Runtime ? u"org.freedesktop.Flatpak.runtime-install"_s : u"org.freedesktop.Flatpak.app-install"_s);

@@ -32,6 +32,10 @@ Result load(const QString &path, const QStringList &languages);
 Result parseBundle(const QByteArray &data, const QStringList &languages);
 Result parseRef(const QByteArray &data);
 
+// Whether a file name looks like something we can install, judging only by
+// its extension: ".flatpak" or ".flatpakref", in any letter case.
+bool isInstallableFileName(const QString &fileName);
+
 // Picks the value for the first matching language. Keys are language tags
 // as found in AppStream ("zh_TW", "zh-Hant-TW", ...); "" is the default.
 QString localizedValue(const QHash<QString, QString> &values, const QStringList &languages);

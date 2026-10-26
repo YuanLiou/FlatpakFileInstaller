@@ -9,6 +9,9 @@
 #                    fetches that URL on every install, even when the runtime
 #                    is already there, so the offline install test needs this
 #   hello.flatpak    org.spike.Hello//stable, a minimal app with no AppStream data
+#   hub-repo/, hub.flatpakrepo
+#                    a local repository that only has the runtime, standing in
+#                    for Flathub when testing that a missing runtime is fetched
 #
 # notes.flatpak and hello.flatpak are checked in (built on x86_64);
 # runtime.flatpak is not, because it contains a busybox binary. The install
@@ -35,6 +38,9 @@ build_runtime() { # <id>
 
 build_runtime org.test.Platform
 flatpak build-bundle --runtime repo "$OUT/runtime.flatpak" org.test.Platform 1
+flatpak build-export --runtime "$OUT/hub-repo" rt 1 >/dev/null
+flatpak build-update-repo "$OUT/hub-repo" >/dev/null
+printf '[Flatpak Repo]\nTitle=Test Hub\nUrl=file://%s/hub-repo\n' "$OUT" > "$OUT/hub.flatpakrepo"
 
 build_runtime org.spike.Platform
 flatpak build-bundle --runtime repo spike.flatpak org.spike.Platform 1

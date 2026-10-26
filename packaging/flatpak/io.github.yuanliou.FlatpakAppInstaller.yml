@@ -16,9 +16,11 @@ finish-args:
   - --device=dri
   # Installing apps means running the host's `flatpak` command through
   # `flatpak-spawn --host`; there is no narrower permission for that.
-  # Files to install arrive through the document portal, so no
-  # --filesystem access is needed.
   - --talk-name=org.freedesktop.Flatpak
+  # Files opened by double-click or dragged from a portal-aware file manager
+  # arrive through the document portal. Browsers' download lists drag plain
+  # paths instead, and downloads land here, so allow reading just this folder.
+  - --filesystem=xdg-download:ro
 
 cleanup:
   - /include

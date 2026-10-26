@@ -58,18 +58,79 @@ private Q_SLOTS:
     {
         PackageInfo bundle;
         bundle.format = PackageInfo::Format::Bundle;
-        QCOMPARE(HostEnvironment::systemInstallActions(bundle, true), QStringList{u"org.freedesktop.Flatpak.install-bundle"_s});
+        HostEnvironment::InstallationState system;
+        QCOMPARE(HostEnvironment::systemInstallActions(bundle, system), QStringList{u"org.freedesktop.Flatpak.install-bundle"_s});
+
+        system.runtimeInstalled = false;
+        system.flathubConfigured = true;
+        QCOMPARE(HostEnvironment::systemInstallActions(bundle, system),
+                 (QStringList{u"org.freedesktop.Flatpak.install-bundle"_s, u"org.freedesktop.Flatpak.runtime-install"_s}));
+
+        system.flathubConfigured = false;
+        QCOMPARE(HostEnvironment::systemInstallActions(bundle, system),
+                 (QStringList{u"org.freedesktop.Flatpak.install-bundle"_s,
+                              u"org.freedesktop.Flatpak.runtime-install"_s,
+                              u"org.freedesktop.Flatpak.configure-remote"_s}));
     }
 
     void actionsForRef()
     {
         PackageInfo ref;
         ref.format = PackageInfo::Format::Ref;
-        QCOMPARE(HostEnvironment::systemInstallActions(ref, true), QStringList{u"org.freedesktop.Flatpak.app-install"_s});
-        QCOMPARE(HostEnvironment::systemInstallActions(ref, false),
+        HostEnvironment::InstallationState system;
+        system.remoteConfigured = true;
+        QCOMPARE(HostEnvironment::systemInstallActions(ref, system), QStringList{u"org.freedesktop.Flatpak.app-install"_s});
+        system.remoteConfigured = false;
+        QCOMPARE(HostEnvironment::systemInstallActions(ref, system),
                  (QStringList{u"org.freedesktop.Flatpak.configure-remote"_s, u"org.freedesktop.Flatpak.app-install"_s}));
+        system.remoteConfigured = true;
         ref.kind = PackageInfo::Kind::Runtime;
-        QCOMPARE(HostEnvironment::systemInstallActions(ref, true), QStringList{u"org.freedesktop.Flatpak.runtime-install"_s});
+        QCOMPARE(HostEnvironment::systemInstallActions(ref, system), QStringList{u"org.freedesktop.Flatpak.runtime-install"_s});
+    }
+
+    void needsFlathub_data()
+    {
+        QTest::addColumn<PackageInfo::Format>("format");
+        QTest::addColumn<QString>("runtimeRepo");
+        QTest::addColumn<bool>("runtimeInstalled");
+        QTest::addColumn<bool>("flathubConfigured");
+        QTest::addColumn<bool>("expected");
+
+        const auto bundle = PackageInfo::Format::Bundle;
+        const QString flathubRepo = u"https://dl.flathub.org/repo/flathub.flatpakrepo"_s;
+        QTest::newRow("runtime missing, no Flathub") << bundle << QString() << false << false << true;
+        QTest::newRow("runtime installed") << bundle << QString() << true << false << false;
+        QTest::newRow("Flathub already there") << bundle << QString() << false << true << false;
+        QTest::newRow("bundle brings its runtime repo") << bundle << flathubRepo << false << false << false;
+        QTest::newRow("flatpakref") << PackageInfo::Format::Ref << QString() << false << false << false;
+    }
+
+    void needsFlathub()
+    {
+        QFETCH(PackageInfo::Format, format);
+        QFETCH(QString, runtimeRepo);
+        QFETCH(bool, runtimeInstalled);
+        QFETCH(bool, flathubConfigured);
+        QFETCH(bool, expected);
+
+        PackageInfo package;
+        package.format = format;
+        package.runtime = u"org.kde.Platform/x86_64/6.10"_s;
+        package.runtimeRepoUrl = runtimeRepo;
+        HostEnvironment::InstallationState state;
+        state.runtimeInstalled = runtimeInstalled;
+        state.flathubConfigured = flathubConfigured;
+        QCOMPARE(HostEnvironment::needsFlathub(package, state), expected);
+    }
+
+    void needsFlathubOnlyForApps()
+    {
+        PackageInfo runtime;
+        runtime.format = PackageInfo::Format::Bundle;
+        runtime.kind = PackageInfo::Kind::Runtime;
+        HostEnvironment::InstallationState state;
+        state.runtimeInstalled = false;
+        QVERIFY(!HostEnvironment::needsFlathub(runtime, state));
     }
 
     void remoteConfigured()

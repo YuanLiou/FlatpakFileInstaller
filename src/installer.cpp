@@ -100,6 +100,11 @@ bool Installer::isInstalledForEveryone() const
     return m_installedForEveryone;
 }
 
+bool Installer::downloadsExtras() const
+{
+    return m_downloadsExtras;
+}
+
 QString Installer::errorMessage() const
 {
     return m_errorMessage;
@@ -118,8 +123,12 @@ void Installer::open(const QUrl &file)
     ++m_generation;
     m_package = {};
     m_path = file.isLocalFile() ? file.toLocalFile() : file.toString();
+    m_hasSystemInstallation = false;
+    m_userState = {};
+    m_systemState = {};
     m_systemAvailable = false;
     m_installedForEveryone = false;
+    m_downloadsExtras = false;
 
     const PackageFile::Result result = PackageFile::load(m_path, KLocalizedString::languages());
     Q_EMIT packageChanged();
@@ -134,10 +143,13 @@ void Installer::open(const QUrl &file)
     m_package = *result.info;
     Q_EMIT packageChanged();
     setState(State::Checking);
-    checkSystemInstall();
+    checkInstallations();
 }
 
-void Installer::checkSystemInstall()
+// The checks below run one after another on the host, then end in Ready:
+// installations → runtime → remotes → polkit authorizations.
+
+void Installer::checkInstallations()
 {
     runOnHost(u"flatpak"_s, {u"--installations"_s}, [this](const Output &installations) {
         if (!installations.ranNormally || installations.exitCode == kCommandNotFound) {
@@ -147,19 +159,49 @@ void Installer::checkSystemInstall()
             return;
         }
         m_hasSystemInstallation = installations.exitCode == 0 && !installations.standardOutput.trimmed().isEmpty();
-        if (!m_hasSystemInstallation) {
-            m_systemAvailable = false;
-            setState(State::Ready);
-            return;
-        }
+        checkRuntime();
+    });
+}
 
-        if (m_package.format == PackageInfo::Format::Bundle) {
-            checkAuthorizations(HostEnvironment::systemInstallActions(m_package, false), {});
+void Installer::checkRuntime()
+{
+    if (m_package.format != PackageInfo::Format::Bundle || m_package.runtime.isEmpty()) {
+        checkRemotes();
+        return;
+    }
+    runOnHost(u"flatpak"_s, FlatpakCli::runtimeInfoArguments(m_package.runtime, false), [this](const Output &user) {
+        const bool inUser = user.ranNormally && user.exitCode == 0;
+        if (!m_hasSystemInstallation) {
+            m_userState.runtimeInstalled = inUser;
+            checkRemotes();
             return;
         }
-        runOnHost(u"flatpak"_s, {u"remotes"_s, u"--system"_s, u"--columns=url"_s}, [this](const Output &remotes) {
-            const bool configured = remotes.exitCode == 0 && HostEnvironment::isRemoteConfigured(m_package.remoteUrl, remotes.standardOutput);
-            checkAuthorizations(HostEnvironment::systemInstallActions(m_package, configured), {});
+        runOnHost(u"flatpak"_s, FlatpakCli::runtimeInfoArguments(m_package.runtime, true), [this, inUser](const Output &system) {
+            const bool inSystem = system.ranNormally && system.exitCode == 0;
+            // Apps installed for one user can use runtimes installed system-wide.
+            m_userState.runtimeInstalled = inUser || inSystem;
+            m_systemState.runtimeInstalled = inSystem;
+            checkRemotes();
+        });
+    });
+}
+
+void Installer::checkRemotes()
+{
+    auto apply = [this](HostEnvironment::InstallationState &state, const Output &remotes) {
+        const QByteArray urls = remotes.ranNormally && remotes.exitCode == 0 ? remotes.standardOutput : QByteArray();
+        state.flathubConfigured = HostEnvironment::isRemoteConfigured(FlatpakCli::flathubUrl(), urls);
+        state.remoteConfigured = HostEnvironment::isRemoteConfigured(m_package.remoteUrl, urls);
+    };
+    runOnHost(u"flatpak"_s, FlatpakCli::remotesArguments(false), [this, apply](const Output &user) {
+        apply(m_userState, user);
+        if (!m_hasSystemInstallation) {
+            checkAuthorizations({}, {});
+            return;
+        }
+        runOnHost(u"flatpak"_s, FlatpakCli::remotesArguments(true), [this, apply](const Output &system) {
+            apply(m_systemState, system);
+            checkAuthorizations(HostEnvironment::systemInstallActions(m_package, m_systemState), {});
         });
     });
 }
@@ -187,16 +229,40 @@ void Installer::install(bool forEveryone)
     if (m_state != State::Ready || (forEveryone && !m_systemAvailable)) {
         return;
     }
+    const HostEnvironment::InstallationState &target = forEveryone ? m_systemState : m_userState;
     m_installedForEveryone = forEveryone;
+    m_downloadsExtras = !target.runtimeInstalled;
     setState(State::Installing);
+
+    if (!HostEnvironment::needsFlathub(m_package, target)) {
+        runInstall(forEveryone);
+        return;
+    }
+    const QStringList addFlathub = FlatpakCli::addRemoteArguments(FlatpakCli::flathubRemoteName(), FlatpakCli::flathubRepoFile(), forEveryone);
+    runOnHost(u"flatpak"_s, addFlathub, [this, forEveryone](const Output &output) {
+        if (output.ranNormally && output.exitCode == 0) {
+            runInstall(forEveryone);
+            return;
+        }
+        failInstall(output);
+    });
+}
+
+void Installer::runInstall(bool forEveryone)
+{
     runOnHost(u"flatpak"_s, FlatpakCli::installArguments(m_package, m_path, forEveryone), [this](const Output &output) {
         if (output.ranNormally && output.exitCode == 0) {
             setState(State::Installed);
             return;
         }
-        const QString details = QString::fromUtf8(output.standardError + output.standardOutput).trimmed();
-        fail(State::Failed, i18n("“%1” couldn't be installed.", m_package.displayName()), details);
+        failInstall(output);
     });
+}
+
+void Installer::failInstall(const Output &output)
+{
+    const QString details = QString::fromUtf8(output.standardError + output.standardOutput).trimmed();
+    fail(State::Failed, i18n("“%1” couldn't be installed.", m_package.displayName()), details);
 }
 
 void Installer::launch()

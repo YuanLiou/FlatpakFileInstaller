@@ -149,6 +149,25 @@ private Q_SLOTS:
         QCOMPARE(result.error, PackageFile::Error::NotFlatpak);
     }
 
+    void installableFileNames_data()
+    {
+        QTest::addColumn<QString>("fileName");
+        QTest::addColumn<bool>("expected");
+        QTest::newRow("bundle") << u"app.flatpak"_s << true;
+        QTest::newRow("ref") << u"app.flatpakref"_s << true;
+        QTest::newRow("upper case") << u"App.FLATPAKREF"_s << true;
+        QTest::newRow("repo file") << u"flathub.flatpakrepo"_s << false;
+        QTest::newRow("other") << u"app.AppImage"_s << false;
+        QTest::newRow("no extension") << u"flatpak"_s << false;
+    }
+
+    void installableFileNames()
+    {
+        QFETCH(QString, fileName);
+        QFETCH(bool, expected);
+        QCOMPARE(PackageFile::isInstallableFileName(fileName), expected);
+    }
+
     void missingFile()
     {
         const auto result = PackageFile::load(fixture("does-not-exist.flatpak"), {});

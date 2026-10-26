@@ -205,6 +205,11 @@ bool looksLikeRef(const QByteArray &data)
 namespace PackageFile
 {
 
+bool isInstallableFileName(const QString &fileName)
+{
+    return fileName.endsWith(".flatpak"_L1, Qt::CaseInsensitive) || fileName.endsWith(".flatpakref"_L1, Qt::CaseInsensitive);
+}
+
 QString localizedValue(const QHash<QString, QString> &values, const QStringList &languages)
 {
     for (const QString &lang : languages) {

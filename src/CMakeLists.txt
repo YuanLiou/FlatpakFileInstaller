@@ -23,6 +23,8 @@ qt_add_qml_module(flatpak-app-installer
         qml/AppTile.qml
         qml/DropTarget.qml
     SOURCES
+        filedroparea.cpp
+        filedroparea.h
         installer.cpp
         installer.h
 )
