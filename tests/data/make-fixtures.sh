@@ -29,18 +29,22 @@ trap 'rm -rf "$WORK"' EXIT
 cd "$WORK"
 export FLATPAK_USER_DIR="$WORK/installation"
 BUSYBOX=$(command -v busybox)
+# A commit's ID covers its timestamp. With a fixed one, exporting the same
+# build to two repositories gives the same commit, which the install test
+# relies on (the "remote" must have exactly the build that was installed).
+EXPORT="flatpak build-export --timestamp=2026-01-01T00:00:00Z"
 
 build_runtime() { # <id>
     rm -rf rt && mkdir -p rt/usr/bin rt/files
     cp "$BUSYBOX" rt/usr/bin/busybox
     for c in sh echo cat; do ln -sf busybox rt/usr/bin/$c; done
     printf '[Runtime]\nname=%s\nruntime=%s/%s/1\nsdk=%s/%s/1\n' "$1" "$1" "$(flatpak --default-arch)" "$1" "$(flatpak --default-arch)" > rt/metadata
-    flatpak build-export --runtime repo rt 1 >/dev/null
+    $EXPORT --runtime repo rt 1 >/dev/null
 }
 
 build_runtime org.test.Platform
 flatpak build-bundle --runtime repo "$OUT/runtime.flatpak" org.test.Platform 1
-flatpak build-export --runtime "$OUT/hub-repo" rt 1 >/dev/null
+$EXPORT --runtime "$OUT/hub-repo" rt 1 >/dev/null
 
 build_runtime org.spike.Platform
 flatpak build-bundle --runtime repo spike.flatpak org.spike.Platform 1
@@ -76,10 +80,10 @@ png = b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', struct.pack('>IIBBBBB', 64, 64, 8, 6
 open(sys.argv[1], 'wb').write(png)
 PY
 flatpak build-finish notes --command=notes --share=network --socket=wayland --socket=pulseaudio --filesystem=home --device=dri >/dev/null
-flatpak build-export repo notes stable >/dev/null
+$EXPORT repo notes stable >/dev/null
 flatpak build-bundle --runtime-repo=https://dl.flathub.org/repo/flathub.flatpakrepo repo "$OUT/notes.flatpak" org.example.Notes stable
 flatpak build-bundle repo "$OUT/notes-offline.flatpak" org.example.Notes stable
-flatpak build-export "$OUT/hub-repo" notes stable >/dev/null
+$EXPORT "$OUT/hub-repo" notes stable >/dev/null
 flatpak build-update-repo "$OUT/hub-repo" >/dev/null
 printf '[Flatpak Repo]\nTitle=Test Hub\nUrl=file://%s/hub-repo\n' "$OUT" > "$OUT/hub.flatpakrepo"
 printf '[Flatpak Ref]\nName=org.example.Notes\nBranch=stable\nTitle=Notes\nUrl=file://%s/hub-repo\n' "$OUT" > "$OUT/notes-hub.flatpakref"
@@ -90,5 +94,5 @@ mkdir -p hello/files/bin
 printf '#!/bin/sh\necho hello from sandbox\n' > hello/files/bin/hello
 chmod +x hello/files/bin/hello
 flatpak build-finish hello --command=hello >/dev/null
-flatpak build-export repo hello stable >/dev/null
+$EXPORT repo hello stable >/dev/null
 flatpak build-bundle repo "$OUT/hello.flatpak" org.spike.Hello stable

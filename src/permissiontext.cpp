@@ -80,6 +80,10 @@ QString describe(const Permissions::Permission &permission)
     case Kind::LegacyDisplay:
         return i18n("Use the older display system, which can let it see what you type in other windows");
     case Kind::Folders:
+        if (permission.folders.size() == 1) {
+            const QString folder = folderName(permission.folders.first());
+            return permission.readOnly ? i18n("See files in the %1 folder", folder) : i18n("See and change files in the %1 folder", folder);
+        }
         return permission.readOnly ? i18n("See files in these folders: %1", folderList(permission.folders))
                                    : i18n("See and change files in these folders: %1", folderList(permission.folders));
     case Kind::Network:

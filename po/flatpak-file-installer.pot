@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: flatpak-file-installer 0.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 09:01+0000\n"
+"POT-Creation-Date: 2026-10-26 09:29+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -218,7 +218,17 @@ msgstr ""
 
 #: src/permissiontext.cpp
 #, kde-format
+msgid "See and change files in the %1 folder"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
 msgid "See and change files in these folders: %1"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See files in the %1 folder"
 msgstr ""
 
 #: src/permissiontext.cpp

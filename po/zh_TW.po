@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: flatpak-file-installer\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/issues\n"
-"POT-Creation-Date: 2026-10-26 08:23+0000\n"
+"POT-Creation-Date: 2026-10-26 09:29+0000\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
@@ -207,8 +207,18 @@ msgstr "查看和修改你所有的個人檔案"
 
 #: src/permissiontext.cpp
 #, kde-format
+msgid "See and change files in the %1 folder"
+msgstr "查看和修改%1資料夾裡的檔案"
+
+#: src/permissiontext.cpp
+#, kde-format
 msgid "See and change files in these folders: %1"
 msgstr "查看和修改這些資料夾裡的檔案：%1"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See files in the %1 folder"
+msgstr "查看%1資料夾裡的檔案"
 
 #: src/permissiontext.cpp
 #, kde-format
