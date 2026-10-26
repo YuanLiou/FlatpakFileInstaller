@@ -14,12 +14,21 @@
 
 > 截圖是在沒有 KDE 桌面主題的虛擬螢幕上拍的；在 Plasma 上會套用系統的外觀。
 
+## 下載
+
+到 [Releases 頁面](https://github.com/YuanLiou/FlatpakFileInstaller/releases/latest)下載最新版。一般電腦選 `x86_64`，ARM 電腦選 `aarch64`。
+
+- **Flatpak**（`FlatpakFileInstaller-<版本>-<架構>.flatpak`）：用軟體中心（例如 Discover）開啟，或執行 `flatpak install --user FlatpakFileInstaller-<版本>-<架構>.flatpak`。需要的 KDE runtime 會從 Flathub 下載。
+- **AppImage**（`Flatpak_File_Installer-<版本>-<架構>.AppImage`）：加上執行權限（`chmod +x`）後執行。
+
+`SHA256SUMS` 列出各檔案的 checksum。
+
 ## 狀態
 
 版本 1.0.0。已完成與尚未完成的需求見 [`docs/requirements.md`](docs/requirements.md)。
 
 - 「只給我用」對應 `flatpak install --user`，「給這台電腦的所有人」對應 `--system`。
-- 發布方式：Flatpak（目標是上架 Flathub）與 AppImage，支援 x86_64 與 aarch64。
+- 發布方式：在 GitHub Releases 提供 Flatpak bundle 與 AppImage，支援 x86_64 與 aarch64。推送新的 `v*` tag 時，會自動建置並附加到該版本的 Release。
 - 以 KDE Plasma、Fedora 44（不可變系統）與 SteamOS 為主要目標。
 
 ## 運作方式
