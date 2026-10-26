@@ -6,11 +6,11 @@
 
 | 準備安裝 | 拖曳中 | 安裝完成 |
 |---|---|---|
-| ![準備安裝](docs/screenshots/ready.png) | ![拖曳中](docs/screenshots/dragging.png) | ![安裝完成](docs/screenshots/installed.png) |
+| ![準備安裝](docs/screenshots/zh-TW/ready.png) | ![拖曳中](docs/screenshots/zh-TW/dragging.png) | ![安裝完成](docs/screenshots/zh-TW/installed.png) |
 
 | 安裝前列出來源與權限 | 已經裝過時 | 把檔案拖進視窗 | SteamOS：自動隱藏「給這台電腦的所有人」 |
 |---|---|---|---|
-| ![安裝前列出來源與權限](docs/screenshots/permissions.png) | ![已經裝過時](docs/screenshots/already-installed.png) | ![把檔案拖進視窗](docs/screenshots/drop-file.png) | ![SteamOS](docs/screenshots/steamos.png) |
+| ![安裝前列出來源與權限](docs/screenshots/zh-TW/permissions.png) | ![已經裝過時](docs/screenshots/zh-TW/already-installed.png) | ![把檔案拖進視窗](docs/screenshots/zh-TW/drop-file.png) | ![SteamOS](docs/screenshots/zh-TW/steamos.png) |
 
 > 截圖是在沒有 KDE 桌面主題的虛擬螢幕上拍的；在 Plasma 上會套用系統的外觀。
 

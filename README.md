@@ -6,13 +6,13 @@ Install apps on Linux the way you would on a Mac, even if you know nothing about
 
 | Ready to install | Dragging | Installed |
 |---|---|---|
-| ![Ready to install](docs/screenshots/ready.png) | ![Dragging](docs/screenshots/dragging.png) | ![Installed](docs/screenshots/installed.png) |
+| ![Ready to install](docs/screenshots/en/ready.png) | ![Dragging](docs/screenshots/en/dragging.png) | ![Installed](docs/screenshots/en/installed.png) |
 
 | Source and permissions, before installing | Already installed | Dropping a file onto the window | SteamOS: "Everyone on this computer" is hidden |
 |---|---|---|---|
-| ![Source and permissions](docs/screenshots/permissions.png) | ![Already installed](docs/screenshots/already-installed.png) | ![Dropping a file onto the window](docs/screenshots/drop-file.png) | ![SteamOS](docs/screenshots/steamos.png) |
+| ![Source and permissions](docs/screenshots/en/permissions.png) | ![Already installed](docs/screenshots/en/already-installed.png) | ![Dropping a file onto the window](docs/screenshots/en/drop-file.png) | ![SteamOS](docs/screenshots/en/steamos.png) |
 
-> The screenshots show the Traditional Chinese interface. The app uses your system language and falls back to English. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
+> The app uses your system language; the screenshots show the English interface. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
 
 ## Status
 
