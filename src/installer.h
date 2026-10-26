@@ -16,6 +16,7 @@
 #include <optional>
 
 class FlathubClient;
+class IconDownloader;
 class QQmlEngine;
 class QJSEngine;
 
@@ -163,6 +164,7 @@ private:
     void checkRefMetadata();
     void checkFlathubMetadata();
     void finishChecks();
+    void fetchIcon();
     void updatePermissions();
     void checkAuthorizations(QStringList actions, QList<HostEnvironment::Authorization> results);
     void startInstall(bool forEveryone, bool reinstall);
@@ -172,6 +174,7 @@ private:
 
     State m_state = State::Empty;
     FlathubClient *m_flathub;
+    IconDownloader *m_icons;
     PackageInfo m_package;
     QVariantList m_permissions;
     QString m_path;

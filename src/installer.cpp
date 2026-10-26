@@ -4,6 +4,7 @@
 #include "flathubclient.h"
 #include "flatpakcli.h"
 #include "hostcommand.h"
+#include "icondownloader.h"
 #include "packagefile.h"
 #include "permissiontext.h"
 
@@ -45,6 +46,7 @@ Installer::Existing toExisting(ExistingInstall::Comparison comparison)
 Installer::Installer(QObject *parent)
     : QObject(parent)
     , m_flathub(new FlathubClient(this))
+    , m_icons(new IconDownloader(this))
 {
 }
 
@@ -240,8 +242,26 @@ void Installer::open(const QUrl &file)
     m_package = *result.info;
     updatePermissions();
     Q_EMIT packageChanged();
+    fetchIcon();
     setState(State::Checking);
     checkInstallations();
+}
+
+// A .flatpakref only links to its icon. It arrives while the checks run;
+// until then the generic icon is shown.
+void Installer::fetchIcon()
+{
+    const QUrl url(m_package.iconUrl);
+    if (!m_package.icon.isNull() || !IconDownloader::isAllowed(url, QUrl(m_package.remoteUrl))) {
+        return;
+    }
+    const quint64 generation = m_generation;
+    m_icons->fetch(url, [this, generation](const QImage &icon) {
+        if (generation == m_generation && !icon.isNull()) {
+            m_package.icon = icon;
+            Q_EMIT packageChanged();
+        }
+    });
 }
 
 // The checks below run one after another on the host, then end in Ready:

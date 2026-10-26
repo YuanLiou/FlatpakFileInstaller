@@ -49,6 +49,7 @@ v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirem
 | 檔案 | 用途 |
 |---|---|
 | `src/packagefile.*` | 讀取 `.flatpak`（OSTree static delta 格式的 GVariant）與 `.flatpakref`（key file） |
+| `src/bundlecontents.*` | 不必安裝，就能從 `.flatpak` 裡讀出單一檔案，例如 App 的圖示 |
 | `src/hostenvironment.*` | 判斷能不能安裝到系統：主機發行版、polkit 授權結果 |
 | `src/hostcommand.*` | 在主機上執行指令 |
 | `src/flatpakcli.*` | 組出 `flatpak` 指令的參數 |
@@ -56,6 +57,7 @@ v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirem
 | `src/permissiontext.*` | 把權限與來源寫成白話的翻譯文字 |
 | `src/existinginstall.*` | 找出已安裝的版本，並和檔案裡的版本比較 |
 | `src/flathubclient.*` | 遠端還沒設定時，向 Flathub 網站查詢 `.flatpakref` 的權限 |
+| `src/icondownloader.*` | 下載 `.flatpakref` 指向的圖示 |
 | `src/installer.*` | 給 QML 用的狀態與操作 |
 | `src/filedroparea.*` | 接收從檔案管理員或瀏覽器拖進視窗的檔案 |
 | `src/qml/` | 介面 |

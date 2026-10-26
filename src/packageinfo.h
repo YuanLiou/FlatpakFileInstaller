@@ -28,6 +28,7 @@ struct PackageInfo {
     QString version;
     QString developer;
     QImage icon;
+    QString iconUrl; // .flatpakref: where its icon can be downloaded
 
     QString runtime; // e.g. org.kde.Platform/x86_64/6.10 (bundles only)
     QString runtimeRepoUrl; // .flatpakrepo that provides the runtime
