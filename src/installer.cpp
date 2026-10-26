@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "installer.h"
 
+#include "flathubclient.h"
 #include "flatpakcli.h"
 #include "hostcommand.h"
 #include "packagefile.h"
@@ -22,6 +23,7 @@ constexpr int kCommandNotFound = 127;
 
 Installer::Installer(QObject *parent)
     : QObject(parent)
+    , m_flathub(new FlathubClient(this))
 {
 }
 
@@ -249,29 +251,53 @@ void Installer::checkRemotes()
 }
 
 // A .flatpakref doesn't say what the app may access. If its remote is
-// already set up somewhere, ask that remote for the app's metadata.
+// already set up somewhere, ask that remote for the app's metadata;
+// otherwise, for Flathub apps, ask Flathub's website.
 void Installer::checkRefMetadata()
 {
-    const auto next = [this] {
-        checkAuthorizations(m_hasSystemInstallation ? HostEnvironment::systemInstallActions(m_package, m_systemState) : QStringList(), {});
-    };
     if (m_package.format != PackageInfo::Format::Ref) {
-        next();
+        finishChecks();
         return;
     }
     const bool fromSystem = m_systemState.remoteConfigured;
     const QString remote = fromSystem ? m_systemState.remoteName : m_userState.remoteName;
     if (remote.isEmpty()) {
-        next();
+        checkFlathubMetadata();
         return;
     }
-    runOnHost(u"flatpak"_s, FlatpakCli::remoteInfoArguments(remote, m_package, fromSystem), [this, next](const Output &info) {
+    runOnHost(u"flatpak"_s, FlatpakCli::remoteInfoArguments(remote, m_package, fromSystem), [this](const Output &info) {
         if (info.ranNormally && info.exitCode == 0) {
             m_package.metadata = info.standardOutput;
             updatePermissions();
+            finishChecks();
+            return;
         }
-        next();
+        checkFlathubMetadata();
     });
+}
+
+void Installer::checkFlathubMetadata()
+{
+    if (Permissions::sourceOf(m_package) != Permissions::Source::Flathub) {
+        finishChecks();
+        return;
+    }
+    const quint64 generation = m_generation;
+    m_flathub->fetchMetadata(m_package, [this, generation](const QByteArray &metadata) {
+        if (generation != m_generation) {
+            return;
+        }
+        if (!metadata.isEmpty()) {
+            m_package.metadata = metadata;
+            updatePermissions();
+        }
+        finishChecks();
+    });
+}
+
+void Installer::finishChecks()
+{
+    checkAuthorizations(m_hasSystemInstallation ? HostEnvironment::systemInstallActions(m_package, m_systemState) : QStringList(), {});
 }
 
 void Installer::checkAuthorizations(QStringList actions, QList<HostEnvironment::Authorization> results)

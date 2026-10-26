@@ -33,6 +33,7 @@ v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirem
                      │    flatpak info <runtime>        ← runtime 裝了沒
                      │    flatpak remotes               ← Flathub 設定了沒
                      │    flatpak remote-info …         ← .flatpakref 的權限
+                     │      （遠端沒設定時改問 flathub.org/api/v2/summary/…）
                      │    pkcheck --action-id …         ← 決定要不要顯示「系統」
                      │    flatpak remote-add flathub …  ← 只在缺 runtime 時
                      │    flatpak install --user|--system …
@@ -50,6 +51,7 @@ v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirem
 | `src/flatpakcli.*` | 組出 `flatpak` 指令的參數 |
 | `src/permissions.*` | 從 metadata 整理出 App 的權限與來源 |
 | `src/permissiontext.*` | 把權限與來源寫成白話的翻譯文字 |
+| `src/flathubclient.*` | 遠端還沒設定時，向 Flathub 網站查詢 `.flatpakref` 的權限 |
 | `src/installer.*` | 給 QML 用的狀態與操作 |
 | `src/filedroparea.*` | 接收從檔案管理員或瀏覽器拖進視窗的檔案 |
 | `src/qml/` | 介面 |

@@ -20,7 +20,7 @@ include(KDECMakeSettings)
 include(KDECompilerSettings NO_POLICY_SCOPE)
 include(FeatureSummary)
 
-find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Widgets Qml Quick QuickControls2)
+find_package(Qt6 ${QT_MIN_VERSION} REQUIRED COMPONENTS Core Gui Network Widgets Qml Quick QuickControls2)
 qt_policy(SET QTP0001 NEW) # QML modules under qrc:/qt/qml/
 qt_policy(SET QTP0004 NEW)
 find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS I18n CoreAddons Archive)
