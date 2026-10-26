@@ -14,12 +14,21 @@ Install apps on Linux the way you would on a Mac, even if you know nothing about
 
 > The app uses your system language; the screenshots show the English interface. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
 
+## Download
+
+Get the latest version from the [Releases page](https://github.com/YuanLiou/FlatpakFileInstaller/releases/latest). Pick `x86_64` for most PCs, or `aarch64` for ARM computers.
+
+- **Flatpak** (`FlatpakFileInstaller-<version>-<arch>.flatpak`): open it with your software center, such as Discover, or run `flatpak install --user FlatpakFileInstaller-<version>-<arch>.flatpak`. The KDE runtime it needs comes from Flathub.
+- **AppImage** (`Flatpak_File_Installer-<version>-<arch>.AppImage`): make it executable (`chmod +x`) and run it.
+
+`SHA256SUMS` lists the checksums of the files.
+
 ## Status
 
 Version 1.0.0. For which requirements are done and which are still open, see [`docs/requirements.md`](docs/requirements.md) (in Traditional Chinese, see [About the documentation](#about-the-documentation)).
 
 - "Just for me" runs `flatpak install --user`; "Everyone on this computer" runs `--system`.
-- Distributed as a Flatpak (aiming for Flathub) and as an AppImage, for x86_64 and aarch64.
+- Distributed as a Flatpak bundle and as an AppImage on GitHub Releases, for x86_64 and aarch64. A new `v*` tag builds them and attaches them to its release.
 - Mainly targets KDE Plasma, Fedora 44 (immutable) and SteamOS.
 
 ## About the documentation

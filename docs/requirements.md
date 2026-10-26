@@ -20,7 +20,7 @@
 | P8 | 操作方式 | **只能拖曳**（不提供點選按鈕替代） |
 | P9 | 無法安裝到系統時 | 程式自行判斷；判斷為裝不了時，直接**隱藏**「系統」這個拖放目標，只留「使用者」 |
 | P10 | 把檔案拖進視窗 | 從檔案管理員或瀏覽器把 `.flatpak`／`.flatpakref` 拖到視窗裡，就開啟該檔案的安裝畫面 |
-| T1 | 發布方式 | 只提供 Flatpak（上架 Flathub）與 AppImage 兩種 |
+| T1 | 發布方式 | 只提供 Flatpak 與 AppImage 兩種，放在 GitHub Releases；Flathub 暫緩（見「已知風險」1） |
 | T2 | CPU 架構 | x86_64 與 aarch64（ARM64） |
 | T3 | 桌面環境 | 專注 KDE Plasma |
 | T4 | 基準平台 | Fedora 44（不可變系統，例如 Kinoite）；另需特別注意 SteamOS（KDE、不可變系統） |
@@ -34,7 +34,7 @@
 
 ## 已知風險
 
-1. **Flathub 審核**：`--talk-name=org.freedesktop.Flatpak` 等於可在主機執行任意指令。Warehouse 有前例，但目前 Flathub 的審核政策尚未確認。
+1. **Flathub 審核**：`--talk-name=org.freedesktop.Flatpak` 等於可在主機執行任意指令。Warehouse 有前例，但目前 Flathub 的審核政策尚未確認。另外，Flathub 的生成式 AI 政策要求揭露 AI 產生的程式碼與文件，Flathub 的 manifest 不可包含 AI 產生或協助的內容，也不可由 AI 開送審 PR 或撰寫說明；審查者可依生成內容的程度直接拒絕。這個專案大部分由 AI 撰寫，所以先只在 GitHub Releases 發布。
 2. **SteamOS 的 system 安裝**：Valve 文件說明預設的 `deck` 帳號**沒有密碼**，因此需要管理員驗證的 system level 安裝很可能無法完成。處理方式見下方「判斷能否安裝到系統」。尚未在實機上驗證。
 3. **AppImage 不會自動成為 `.flatpak` 的預設開啟程式**：需要 app 在第一次執行時協助註冊，或依賴 Gear Lever 等整合工具。
 4. **AppImage 與 FUSE**：舊版 AppImage runtime 需要主機有 libfuse2；應使用新版靜態連結的 type2 runtime。尚未在 Fedora 44 Atomic／SteamOS 上實測。

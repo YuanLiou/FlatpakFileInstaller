@@ -7,6 +7,11 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      tag:
+        description: Build this release tag (e.g. v1.0.0) and attach the files to its GitHub release
+        required: false
+        type: string
 
 permissions:
   contents: read
@@ -39,6 +44,8 @@ jobs:
             qml6-module-qtquick-window qml6-module-qtquick-dialogs qml6-module-qtqml-workerscript \
             qt6-svg-plugins appstream desktop-file-utils flatpak busybox-static python3
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
       - name: Configure
         run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
       - name: Build
@@ -69,13 +76,15 @@ jobs:
       options: --privileged
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
       - uses: flathub-infra/flatpak-github-actions/flatpak-builder@master
         with:
           # The action adds the architecture to the artifact name itself.
           bundle: FlatpakFileInstaller.flatpak
           manifest-path: packaging/flatpak/io.github.yuanliou.FlatpakFileInstaller.yml
           arch: ${{ matrix.arch }}
-          cache-key: flatpak-builder-${{ matrix.arch }}-${{ github.sha }}
+          cache-key: flatpak-builder-${{ matrix.arch }}-${{ inputs.tag || github.sha }}
 
   appimage:
     name: AppImage (${{ matrix.arch }})
@@ -91,6 +100,8 @@ jobs:
     container: ubuntu:26.04
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
       - name: Install dependencies
         run: |
           apt-get update
@@ -108,3 +119,48 @@ jobs:
         with:
           name: AppImage-${{ matrix.arch }}
           path: build-appimage/*.AppImage
+
+  # On a v* tag (or a run started by hand for one), attach the Flatpak
+  # bundles and AppImages to that tag's GitHub release, creating the
+  # release if there isn't one yet.
+  release:
+    name: Attach to the release
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.tag != ''
+    needs: [test, flatpak, appimage]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: ${{ inputs.tag || github.ref_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+      - name: Tag matches the version
+        run: |
+          version=$(sed -n 's/^project(flatpak-file-installer VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
+          if [ "$TAG" != "v$version" ]; then
+            echo "::error::Tag $TAG doesn't match the version in CMakeLists.txt ($version)"
+            exit 1
+          fi
+          echo "VERSION=$version" >> "$GITHUB_ENV"
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: Collect files
+        run: |
+          mkdir upload
+          for arch in x86_64 aarch64; do
+            cp artifacts/FlatpakFileInstaller-$arch.flatpak/*.flatpak "upload/FlatpakFileInstaller-$VERSION-$arch.flatpak"
+          done
+          cp artifacts/AppImage-*/*.AppImage upload/
+          (cd upload && sha256sum * > SHA256SUMS)
+          ls -l upload
+      - name: Upload
+        run: |
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            gh release create "$TAG" --verify-tag --title "Flatpak File Installer $VERSION" --generate-notes
+          fi
+          gh release upload "$TAG" upload/* --clobber
