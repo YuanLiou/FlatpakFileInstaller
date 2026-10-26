@@ -43,6 +43,7 @@ struct InstallationState {
     bool runtimeInstalled = true; // the app's runtime can be used from it
     bool flathubConfigured = false;
     bool remoteConfigured = false; // the .flatpakref's own remote
+    QString remoteName; // its name, when configured
 };
 
 // Whether to add Flathub before installing, so that flatpak can download
@@ -53,9 +54,10 @@ bool needsFlathub(const PackageInfo &package, const InstallationState &state);
 // polkit actions flatpak's system helper checks for this install.
 QStringList systemInstallActions(const PackageInfo &package, const InstallationState &system);
 
-// Whether `remoteUrl` is one of the configured remotes' URLs
-// (output of `flatpak remotes --system --columns=url`).
-bool isRemoteConfigured(const QString &remoteUrl, const QByteArray &remotesOutput);
+// The name of the configured remote whose URL is `remoteUrl`, or an empty
+// string. `remotesOutput` is the output of
+// `flatpak remotes --columns=name,url`: one "name<TAB>url" line per remote.
+QString remoteNameForUrl(const QString &remoteUrl, const QByteArray &remotesOutput);
 
 // Whether to show the "System" drop target.
 bool offerSystemInstall(bool hasSystemInstallation, const QList<Authorization> &authorizations, bool steamOS);

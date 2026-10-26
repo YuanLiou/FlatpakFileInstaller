@@ -68,7 +68,12 @@ private Q_SLOTS:
     {
         QCOMPARE(FlatpakCli::addRemoteArguments(FlatpakCli::flathubRemoteName(), FlatpakCli::flathubRepoFile(), false),
                  (QStringList{u"remote-add"_s, u"--user"_s, u"--if-not-exists"_s, u"flathub"_s, u"https://dl.flathub.org/repo/flathub.flatpakrepo"_s}));
-        QCOMPARE(FlatpakCli::remotesArguments(true), (QStringList{u"remotes"_s, u"--system"_s, u"--columns=url"_s}));
+        QCOMPARE(FlatpakCli::remotesArguments(true), (QStringList{u"remotes"_s, u"--system"_s, u"--columns=name,url"_s}));
+        PackageInfo app;
+        app.id = u"org.example.Notes"_s;
+        app.branch = u"stable"_s;
+        QCOMPARE(FlatpakCli::remoteInfoArguments(u"flathub"_s, app, true),
+                 (QStringList{u"remote-info"_s, u"--system"_s, u"--show-metadata"_s, u"flathub"_s, u"org.example.Notes//stable"_s}));
         QCOMPARE(FlatpakCli::runtimeInfoArguments(u"org.kde.Platform/x86_64/6.10"_s, false),
                  (QStringList{u"info"_s, u"--user"_s, u"org.kde.Platform/x86_64/6.10"_s}));
     }

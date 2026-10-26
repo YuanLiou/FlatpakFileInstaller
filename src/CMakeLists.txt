@@ -6,6 +6,7 @@ add_library(installer_core STATIC
     hostcommand.cpp
     hostenvironment.cpp
     packagefile.cpp
+    permissions.cpp
 )
 target_include_directories(installer_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(installer_core
@@ -22,11 +23,14 @@ qt_add_qml_module(flatpak-app-installer
         qml/Main.qml
         qml/AppTile.qml
         qml/DropTarget.qml
+        qml/PermissionsCard.qml
     SOURCES
         filedroparea.cpp
         filedroparea.h
         installer.cpp
         installer.h
+        permissiontext.cpp
+        permissiontext.h
 )
 
 set_source_files_properties(${PROJECT_SOURCE_DIR}/data/icons/${APP_ID}.svg PROPERTIES QT_RESOURCE_ALIAS app.svg)
@@ -38,7 +42,9 @@ qt_add_resources(flatpak-app-installer icons
         icons/arrow.svg
         icons/computer.svg
         icons/done.svg
+        icons/dot.svg
         icons/error.svg
+        icons/info.svg
         icons/package.svg
         icons/user.svg
 )

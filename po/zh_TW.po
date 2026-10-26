@@ -6,9 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: flatpak-app-installer\n"
-"Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/"
-"issues\n"
-"POT-Creation-Date: 2026-10-26 07:19+0000\n"
+"Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/issues\n"
+"POT-Creation-Date: 2026-10-26 07:43+0000\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
@@ -43,20 +42,12 @@ msgid "Install downloaded apps by dragging them"
 msgstr "用拖曳的方式安裝下載的 App"
 
 #: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
-msgid ""
-"Downloaded an app that ends in “.flatpak” or “.flatpakref”? Double-click it "
-"and drag the app to where you want to install it, just like on a Mac."
-msgstr ""
-"下載了檔名結尾是「.flatpak」或「.flatpakref」的 App 嗎？在檔案上按兩下，再把 "
-"App 拖到你想安裝的位置就好，跟在 Mac 上安裝一樣簡單。"
+msgid "Downloaded an app that ends in “.flatpak” or “.flatpakref”? Double-click it and drag the app to where you want to install it, just like on a Mac."
+msgstr "下載了檔名結尾是「.flatpak」或「.flatpakref」的 App 嗎？在檔案上按兩下，再把 App 拖到你想安裝的位置就好，跟在 Mac 上安裝一樣簡單。"
 
 #: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
-msgid ""
-"Choose “Just for me” to install it only for yourself, or “Everyone on this "
-"computer” so that everybody who uses the computer can open it."
-msgstr ""
-"選「只給我用」就只有你能使用；選「給這台電腦的所有人」，每個使用這台電腦的人"
-"都能開啟。"
+msgid "Choose “Just for me” to install it only for yourself, or “Everyone on this computer” so that everybody who uses the computer can open it."
+msgstr "選「只給我用」就只有你能使用；選「給這台電腦的所有人」，每個使用這台電腦的人都能開啟。"
 
 #: data/io.github.yuanliou.FlatpakAppInstaller.metainfo.xml.in
 msgid "First development version."
@@ -64,9 +55,7 @@ msgstr "第一個開發版本。"
 
 #: src/installer.cpp
 #, kde-format
-msgid ""
-"This computer can't install Flatpak apps yet, because the Flatpak software "
-"isn't installed."
+msgid "This computer can't install Flatpak apps yet, because the Flatpak software isn't installed."
 msgstr "這台電腦還沒有安裝 Flatpak，所以暫時沒辦法安裝 Flatpak App。"
 
 #: src/installer.cpp
@@ -76,12 +65,8 @@ msgstr "這個檔案打不開，可能已經被移動或刪除了。"
 
 #: src/installer.cpp
 #, kde-format
-msgid ""
-"This file isn't an app that can be installed here. Look for a download that "
-"ends in “.flatpak” or “.flatpakref”."
-msgstr ""
-"這個檔案不是可以在這裡安裝的 App。請找檔名結尾是「.flatpak」或「.flatpakref」"
-"的下載檔案。"
+msgid "This file isn't an app that can be installed here. Look for a download that ends in “.flatpak” or “.flatpakref”."
+msgstr "這個檔案不是可以在這裡安裝的 App。請找檔名結尾是「.flatpak」或「.flatpakref」的下載檔案。"
 
 #: src/installer.cpp
 #, kde-format
@@ -93,12 +78,235 @@ msgstr "「%1」沒有安裝成功。"
 msgid "The .flatpak or .flatpakref file to install"
 msgstr "要安裝的 .flatpak 或 .flatpakref 檔案"
 
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "separator between folder names in a list"
+msgid ", "
+msgstr "、"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "A file you downloaded"
+msgstr "你下載的檔案"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Change system files and settings"
+msgstr "修改系統檔案和設定"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Change the settings and data of other apps"
+msgstr "修改其他 App 的設定和資料"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Desktop"
+msgstr "桌面"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Documents"
+msgstr "文件"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Downloads"
+msgstr "下載"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Flathub is the biggest app store for Linux."
+msgstr "Flathub 是 Linux 上最大的 App 商店。"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "From %1"
+msgstr "來自 %1"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "From Flathub"
+msgstr "來自 Flathub"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "From another source"
+msgstr "來自其他來源"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "It doesn't come from an app store, so there's no way to check who made it. Install it only if you trust the website you got it from."
+msgstr "這個 App 不是從 App 商店來的，沒辦法確認是誰做的。請確定你信任提供這個檔案的網站，再安裝它。"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Music"
+msgstr "音樂"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Pictures"
+msgstr "圖片"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Play sound and use the microphone"
+msgstr "播放聲音，也能使用麥克風"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Public"
+msgstr "公共"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Read passwords saved on this computer"
+msgstr "讀取這台電腦上儲存的密碼"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Run any program on this computer"
+msgstr "在這台電腦上執行任何程式"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Run virtual machines"
+msgstr "執行虛擬機器"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See all files on this computer"
+msgstr "查看這台電腦上的所有檔案"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See all your personal files"
+msgstr "查看你所有的個人檔案"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See and change all files on this computer"
+msgstr "查看和修改這台電腦上的所有檔案"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See and change all your personal files"
+msgstr "查看和修改你所有的個人檔案"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See and change files in these folders: %1"
+msgstr "查看和修改這些資料夾裡的檔案：%1"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See files in these folders: %1"
+msgstr "查看這些資料夾裡的檔案：%1"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See system files and settings"
+msgstr "查看系統檔案和設定"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Talk freely with other programs on this computer"
+msgstr "和這台電腦上的其他程式自由溝通"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Talk freely with the system's services"
+msgstr "和系統服務自由溝通"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Templates"
+msgstr "範本"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "This isn't a well-known app store. Install it only if you trust this website."
+msgstr "這不是常見的 App 商店。請確定你信任這個網站，再安裝它。"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use Bluetooth"
+msgstr "使用藍牙"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use USB devices"
+msgstr "使用 USB 裝置"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use all devices, such as cameras, microphones and USB drives"
+msgstr "使用所有裝置，例如相機、麥克風和隨身碟"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use game controllers and other input devices"
+msgstr "使用遊戲手把等輸入裝置"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use printers"
+msgstr "使用印表機"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use smart card readers"
+msgstr "使用晶片讀卡機"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use the internet"
+msgstr "連上網路"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use the older display system, which can let it see what you type in other windows"
+msgstr "使用舊式的顯示方式，這可能讓它看到你在其他視窗輸入的內容"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use your SSH keys for signing in to servers"
+msgstr "使用你登入伺服器用的 SSH 金鑰"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use your encryption keys"
+msgstr "使用你的加密金鑰"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Videos"
+msgstr "影片"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "a folder in a list of folders; %1 is its name"
+msgid "“%1”"
+msgstr "「%1」"
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "a folder in a list of folders; %1 is its path"
+msgid "“%1”"
+msgstr "「%1」"
+
 #: src/qml/Main.qml
-msgid ""
-"Ask the person who manages this computer to install Flatpak, or see "
-"flatpak.org/setup for instructions."
-msgstr ""
-"請管理這台電腦的人幫忙安裝 Flatpak，或到 flatpak.org/setup 查看安裝說明。"
+msgid "Ask the person who manages this computer to install Flatpak, or see flatpak.org/setup for instructions."
+msgstr "請管理這台電腦的人幫忙安裝 Flatpak，或到 flatpak.org/setup 查看安裝說明。"
 
 #: src/qml/Main.qml
 msgid "By %1"
@@ -121,9 +329,7 @@ msgid "Done"
 msgstr "完成"
 
 #: src/qml/Main.qml
-msgid ""
-"Double-click an app you downloaded (a file ending in “.flatpak” or "
-"“.flatpakref”), drag it onto this window, or choose one here."
+msgid "Double-click an app you downloaded (a file ending in “.flatpak” or “.flatpakref”), drag it onto this window, or choose one here."
 msgstr "在下載好的 App 檔案（檔名結尾是「.flatpak」或「.flatpakref」）上按兩下、把它拖到這個視窗，或是在這裡選擇檔案。"
 
 #: src/qml/Main.qml
@@ -139,9 +345,7 @@ msgid "Everyone on this computer can now find it in the app menu."
 msgstr "這台電腦的所有人現在都可以在應用程式選單裡找到它。"
 
 #: src/qml/Main.qml
-msgid ""
-"Everyone who uses this computer can open it. You may need to enter your "
-"password."
+msgid "Everyone who uses this computer can open it. You may need to enter your password."
 msgstr "每個使用這台電腦的人都能開啟，可能需要輸入你的密碼。"
 
 #: src/qml/Main.qml
@@ -202,9 +406,7 @@ msgid "Show Details"
 msgstr "顯示詳細資訊"
 
 #: src/qml/Main.qml
-msgid ""
-"This app needs some extra parts from the internet, so this may take a while. "
-"Please keep this window open."
+msgid "This app needs some extra parts from the internet, so this may take a while. Please keep this window open."
 msgstr "這個 App 還需要從網路下載一些額外的元件，可能會花比較久的時間，請不要關閉這個視窗。"
 
 #: src/qml/Main.qml
@@ -226,3 +428,19 @@ msgstr "現在可以在應用程式選單裡找到它了。"
 #: src/qml/Main.qml
 msgid "“%1” is installed"
 msgstr "「%1」安裝好了"
+
+#: src/qml/PermissionsCard.qml
+msgid "Many good apps need this kind of access. Just make sure you trust this one."
+msgstr "很多好用的 App 都需要這類權限，只要確定你信任這個 App 就好。"
+
+#: src/qml/PermissionsCard.qml
+msgid "This app can:"
+msgstr "這個 App 可以："
+
+#: src/qml/PermissionsCard.qml
+msgid "This app doesn't need any special access."
+msgstr "這個 App 不需要特別的權限。"
+
+#: src/qml/PermissionsCard.qml
+msgid "We couldn't find out what this app can access."
+msgstr "目前無法得知這個 App 需要哪些權限。"

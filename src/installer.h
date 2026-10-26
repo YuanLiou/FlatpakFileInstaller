@@ -8,6 +8,7 @@
 #include <QProcess>
 #include <QUrl>
 #include <QVariant>
+#include <QVariantList>
 #include <QtQmlIntegration>
 
 #include <functional>
@@ -37,6 +38,13 @@ class Installer : public QObject
     Q_PROPERTY(bool installedForEveryone READ isInstalledForEveryone NOTIFY stateChanged)
     // The install also downloads a runtime the app needs, so it takes longer.
     Q_PROPERTY(bool downloadsExtras READ downloadsExtras NOTIFY stateChanged)
+    // Where the app comes from, in plain words.
+    Q_PROPERTY(QString sourceTitle READ sourceTitle NOTIFY packageChanged)
+    Q_PROPERTY(QString sourceExplanation READ sourceExplanation NOTIFY packageChanged)
+    Q_PROPERTY(bool sourceNeedsTrust READ sourceNeedsTrust NOTIFY packageChanged)
+    // What the app may access: a list of {text, needsTrust} maps.
+    Q_PROPERTY(QVariantList permissions READ permissions NOTIFY packageChanged)
+    Q_PROPERTY(bool permissionsKnown READ permissionsKnown NOTIFY packageChanged)
     Q_PROPERTY(QString errorMessage READ errorMessage NOTIFY stateChanged)
     Q_PROPERTY(QString errorDetails READ errorDetails NOTIFY stateChanged)
 
@@ -73,6 +81,11 @@ public:
     bool isSystemAvailable() const;
     bool isInstalledForEveryone() const;
     bool downloadsExtras() const;
+    QString sourceTitle() const;
+    QString sourceExplanation() const;
+    bool sourceNeedsTrust() const;
+    QVariantList permissions() const;
+    bool permissionsKnown() const;
     QString errorMessage() const;
     QString errorDetails() const;
 
@@ -100,12 +113,15 @@ private:
     void checkInstallations();
     void checkRuntime();
     void checkRemotes();
+    void checkRefMetadata();
+    void updatePermissions();
     void checkAuthorizations(QStringList actions, QList<HostEnvironment::Authorization> results);
     void runInstall(bool forEveryone);
     void failInstall(const Output &output);
 
     State m_state = State::Empty;
     PackageInfo m_package;
+    QVariantList m_permissions;
     QString m_path;
     bool m_hasSystemInstallation = false;
     HostEnvironment::InstallationState m_userState;

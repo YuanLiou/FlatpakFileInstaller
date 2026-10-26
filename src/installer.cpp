@@ -4,6 +4,7 @@
 #include "flatpakcli.h"
 #include "hostcommand.h"
 #include "packagefile.h"
+#include "permissiontext.h"
 
 #include <KFormat>
 #include <KLocalizedString>
@@ -105,6 +106,44 @@ bool Installer::downloadsExtras() const
     return m_downloadsExtras;
 }
 
+QString Installer::sourceTitle() const
+{
+    return PermissionText::sourceTitle(m_package);
+}
+
+QString Installer::sourceExplanation() const
+{
+    return PermissionText::sourceExplanation(m_package);
+}
+
+bool Installer::sourceNeedsTrust() const
+{
+    return PermissionText::sourceNeedsTrust(m_package);
+}
+
+bool Installer::permissionsKnown() const
+{
+    return !m_package.metadata.isEmpty();
+}
+
+QVariantList Installer::permissions() const
+{
+    return m_permissions;
+}
+
+void Installer::updatePermissions()
+{
+    m_permissions.clear();
+    const QList<Permissions::Permission> permissions = Permissions::fromMetadata(m_package.metadata);
+    for (const Permissions::Permission &permission : permissions) {
+        m_permissions.append(QVariantMap{
+            {u"text"_s, PermissionText::describe(permission)},
+            {u"needsTrust"_s, Permissions::needsTrust(permission.kind)},
+        });
+    }
+    Q_EMIT packageChanged();
+}
+
 QString Installer::errorMessage() const
 {
     return m_errorMessage;
@@ -122,6 +161,7 @@ void Installer::open(const QUrl &file)
     }
     ++m_generation;
     m_package = {};
+    m_permissions.clear();
     m_path = file.isLocalFile() ? file.toLocalFile() : file.toString();
     m_hasSystemInstallation = false;
     m_userState = {};
@@ -141,6 +181,7 @@ void Installer::open(const QUrl &file)
     }
 
     m_package = *result.info;
+    updatePermissions();
     Q_EMIT packageChanged();
     setState(State::Checking);
     checkInstallations();
@@ -189,20 +230,47 @@ void Installer::checkRuntime()
 void Installer::checkRemotes()
 {
     auto apply = [this](HostEnvironment::InstallationState &state, const Output &remotes) {
-        const QByteArray urls = remotes.ranNormally && remotes.exitCode == 0 ? remotes.standardOutput : QByteArray();
-        state.flathubConfigured = HostEnvironment::isRemoteConfigured(FlatpakCli::flathubUrl(), urls);
-        state.remoteConfigured = HostEnvironment::isRemoteConfigured(m_package.remoteUrl, urls);
+        const QByteArray list = remotes.ranNormally && remotes.exitCode == 0 ? remotes.standardOutput : QByteArray();
+        state.flathubConfigured = !HostEnvironment::remoteNameForUrl(FlatpakCli::flathubUrl(), list).isEmpty();
+        state.remoteName = HostEnvironment::remoteNameForUrl(m_package.remoteUrl, list);
+        state.remoteConfigured = !state.remoteName.isEmpty();
     };
     runOnHost(u"flatpak"_s, FlatpakCli::remotesArguments(false), [this, apply](const Output &user) {
         apply(m_userState, user);
         if (!m_hasSystemInstallation) {
-            checkAuthorizations({}, {});
+            checkRefMetadata();
             return;
         }
         runOnHost(u"flatpak"_s, FlatpakCli::remotesArguments(true), [this, apply](const Output &system) {
             apply(m_systemState, system);
-            checkAuthorizations(HostEnvironment::systemInstallActions(m_package, m_systemState), {});
+            checkRefMetadata();
         });
+    });
+}
+
+// A .flatpakref doesn't say what the app may access. If its remote is
+// already set up somewhere, ask that remote for the app's metadata.
+void Installer::checkRefMetadata()
+{
+    const auto next = [this] {
+        checkAuthorizations(m_hasSystemInstallation ? HostEnvironment::systemInstallActions(m_package, m_systemState) : QStringList(), {});
+    };
+    if (m_package.format != PackageInfo::Format::Ref) {
+        next();
+        return;
+    }
+    const bool fromSystem = m_systemState.remoteConfigured;
+    const QString remote = fromSystem ? m_systemState.remoteName : m_userState.remoteName;
+    if (remote.isEmpty()) {
+        next();
+        return;
+    }
+    runOnHost(u"flatpak"_s, FlatpakCli::remoteInfoArguments(remote, m_package, fromSystem), [this, next](const Output &info) {
+        if (info.ranNormally && info.exitCode == 0) {
+            m_package.metadata = info.standardOutput;
+            updatePermissions();
+        }
+        next();
     });
 }
 

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: flatpak-app-installer 0.1.0\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakAppInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 07:19+0000\n"
+"POT-Creation-Date: 2026-10-26 07:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,6 +85,237 @@ msgstr ""
 #: src/main.cpp
 #, kde-format
 msgid "The .flatpak or .flatpakref file to install"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "separator between folder names in a list"
+msgid ", "
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "A file you downloaded"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Change system files and settings"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Change the settings and data of other apps"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Desktop"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Documents"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Downloads"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Flathub is the biggest app store for Linux."
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "From %1"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "From Flathub"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "From another source"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid ""
+"It doesn't come from an app store, so there's no way to check who made it. "
+"Install it only if you trust the website you got it from."
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Music"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Pictures"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Play sound and use the microphone"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Public"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Read passwords saved on this computer"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Run any program on this computer"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Run virtual machines"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See all files on this computer"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See all your personal files"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See and change all files on this computer"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See and change all your personal files"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See and change files in these folders: %1"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See files in these folders: %1"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "See system files and settings"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Talk freely with other programs on this computer"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Talk freely with the system's services"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Templates"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid ""
+"This isn't a well-known app store. Install it only if you trust this website."
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use Bluetooth"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use USB devices"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use all devices, such as cameras, microphones and USB drives"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use game controllers and other input devices"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use printers"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use smart card readers"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use the internet"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid ""
+"Use the older display system, which can let it see what you type in other "
+"windows"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use your SSH keys for signing in to servers"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgid "Use your encryption keys"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "folder name"
+msgid "Videos"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "a folder in a list of folders; %1 is its name"
+msgid "“%1”"
+msgstr ""
+
+#: src/permissiontext.cpp
+#, kde-format
+msgctxt "a folder in a list of folders; %1 is its path"
+msgid "“%1”"
 msgstr ""
 
 #: src/qml/Main.qml
@@ -218,4 +449,21 @@ msgstr ""
 
 #: src/qml/Main.qml
 msgid "“%1” is installed"
+msgstr ""
+
+#: src/qml/PermissionsCard.qml
+msgid ""
+"Many good apps need this kind of access. Just make sure you trust this one."
+msgstr ""
+
+#: src/qml/PermissionsCard.qml
+msgid "This app can:"
+msgstr ""
+
+#: src/qml/PermissionsCard.qml
+msgid "This app doesn't need any special access."
+msgstr ""
+
+#: src/qml/PermissionsCard.qml
+msgid "We couldn't find out what this app can access."
 msgstr ""

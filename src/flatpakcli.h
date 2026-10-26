@@ -24,8 +24,11 @@ QStringList runArguments(const PackageInfo &package, bool forEveryone);
 // Adds a remote from a .flatpakrepo file, unless one with that name exists.
 QStringList addRemoteArguments(const QString &name, const QString &repoFile, bool forEveryone);
 
-// Lists the URLs of the configured remotes.
+// Lists the configured remotes as "name<TAB>url" lines.
 QStringList remotesArguments(bool forEveryone);
+
+// Prints the metadata (including permissions) of `package` in `remote`.
+QStringList remoteInfoArguments(const QString &remote, const PackageInfo &package, bool forEveryone);
 
 // Succeeds when `runtime` (e.g. "org.kde.Platform/x86_64/6.10") is installed.
 QStringList runtimeInfoArguments(const QString &runtime, bool forEveryone);

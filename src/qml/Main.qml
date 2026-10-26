@@ -11,9 +11,9 @@ Kirigami.ApplicationWindow {
 
     title: Installer.state === Installer.Empty ? i18n("Flatpak App Installer") : i18n("Install “%1”", Installer.appName)
     width: Kirigami.Units.gridUnit * 38
-    height: Kirigami.Units.gridUnit * 24
+    height: Kirigami.Units.gridUnit * 36
     minimumWidth: Kirigami.Units.gridUnit * 30
-    minimumHeight: Kirigami.Units.gridUnit * 20
+    minimumHeight: Kirigami.Units.gridUnit * 28
 
     pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
     pageStack.initialPage: Kirigami.Page {
@@ -145,6 +145,12 @@ Kirigami.ApplicationWindow {
                 opacity: 0.7
             }
 
+            PermissionsCard {
+                Layout.fillWidth: true
+                Layout.maximumHeight: Kirigami.Units.gridUnit * 18
+                Layout.preferredHeight: implicitHeight
+            }
+
             RowLayout {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
@@ -200,9 +206,7 @@ Kirigami.ApplicationWindow {
         id: installingView
         Kirigami.LoadingPlaceholder {
             text: i18n("Installing “%1”…", Installer.appName)
-            explanation: Installer.downloadsExtras
-                ? i18n("This app needs some extra parts from the internet, so this may take a while. Please keep this window open.")
-                : i18n("This may take a few minutes. Please keep this window open.")
+            explanation: Installer.downloadsExtras ? i18n("This app needs some extra parts from the internet, so this may take a while. Please keep this window open.") : i18n("This may take a few minutes. Please keep this window open.")
         }
     }
 

@@ -133,15 +133,18 @@ private Q_SLOTS:
         QVERIFY(!HostEnvironment::needsFlathub(runtime, state));
     }
 
-    void remoteConfigured()
+    void remoteNameForUrl()
     {
-        const QByteArray remotes = "https://dl.flathub.org/repo/\nhttps://registry.fedoraproject.org/\n";
-        QVERIFY(HostEnvironment::isRemoteConfigured(u"https://dl.flathub.org/repo/"_s, remotes));
-        QVERIFY(HostEnvironment::isRemoteConfigured(u"https://dl.flathub.org/repo"_s, remotes));
-        QVERIFY(HostEnvironment::isRemoteConfigured(u"HTTPS://DL.FLATHUB.ORG/repo/"_s, remotes));
-        QVERIFY(!HostEnvironment::isRemoteConfigured(u"https://flathub.org/beta-repo/"_s, remotes));
-        QVERIFY(!HostEnvironment::isRemoteConfigured(QString(), remotes));
-        QVERIFY(!HostEnvironment::isRemoteConfigured(u"https://dl.flathub.org/repo/"_s, QByteArray()));
+        const QByteArray remotes = "flathub\thttps://dl.flathub.org/repo/\nfedora\toci+https://registry.fedoraproject.org\n";
+        QCOMPARE(HostEnvironment::remoteNameForUrl(u"https://dl.flathub.org/repo/"_s, remotes), u"flathub"_s);
+        QCOMPARE(HostEnvironment::remoteNameForUrl(u"https://dl.flathub.org/repo"_s, remotes), u"flathub"_s);
+        QCOMPARE(HostEnvironment::remoteNameForUrl(u"HTTPS://DL.FLATHUB.ORG/repo/"_s, remotes), u"flathub"_s);
+        QCOMPARE(HostEnvironment::remoteNameForUrl(u"oci+https://registry.fedoraproject.org/"_s, remotes), u"fedora"_s);
+        QVERIFY(HostEnvironment::remoteNameForUrl(u"https://flathub.org/beta-repo/"_s, remotes).isEmpty());
+        QVERIFY(HostEnvironment::remoteNameForUrl(QString(), remotes).isEmpty());
+        QVERIFY(HostEnvironment::remoteNameForUrl(u"https://dl.flathub.org/repo/"_s, QByteArray()).isEmpty());
+        // A line without a name column is not a match.
+        QVERIFY(HostEnvironment::remoteNameForUrl(u"https://dl.flathub.org/repo/"_s, "https://dl.flathub.org/repo/\n").isEmpty());
     }
 
     void offerSystemInstall_data()
