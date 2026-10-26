@@ -40,9 +40,15 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
-    <release version="0.1.0" date="2026-10-26">
+    <release version="1.0.0" date="2026-10-26">
       <description>
-        <p>First development version.</p>
+        <p>The first release.</p>
+        <ul>
+          <li>Install “.flatpak” and “.flatpakref” files by dragging the app to “Just for me” or “Everyone on this computer”.</li>
+          <li>See where an app comes from and what it can do before you install it.</li>
+          <li>If the app is already installed, choose whether to open it, update it or install it again.</li>
+          <li>Anything else an app needs is downloaded from Flathub automatically.</li>
+        </ul>
       </description>
     </release>
   </releases>
