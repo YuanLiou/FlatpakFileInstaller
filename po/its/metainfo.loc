@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<!-- SPDX-License-Identifier: Apache-2.0 -->
+<locatingRules>
+  <locatingRule name="AppStream" pattern="*.metainfo.xml*">
+    <documentRule localName="component" target="metainfo.its"/>
+  </locatingRule>
+</locatingRules>

@@ -24,3 +24,20 @@ sudo python3 spike/spike_install.py /tmp/spike-work/hello.flatpak system
 | bundle 依賴的 runtime 不存在、又沒有 remote 可抓 | ❌ 會失敗：`requires the runtime ... which was not found` |
 | 一般使用者裝到 system（走 polkit / flatpak-system-helper） | ⚠️ 未驗證：容器內沒有 system bus / polkit agent |
 | 從 Flathub 自動補 runtime | ⚠️ 未驗證：容器連不到 Flathub |
+
+# Spike 2：從 Flatpak sandbox 裡把 bundle 裝到主機
+
+```sh
+sudo apt install flatpak-xdg-utils
+dbus-run-session -- sh spike/sandbox_spike.sh /tmp/spike2-work
+```
+
+做法與 Flathub 上的 Warehouse 相同：`--talk-name=org.freedesktop.Flatpak`，再用 `flatpak-spawn --host flatpak install ...`。
+
+| 項目 | 結果 |
+|---|---|
+| 有 `--talk-name=org.freedesktop.Flatpak` 時，從 sandbox 內安裝到主機的 user installation | ✅ 成功 |
+| 同上，裝到 system installation | ✅ 成功（以 root 執行） |
+| 以 `flatpak override --no-talk-name=...` 拿掉權限 | ❌ 如預期失敗：`--host only works when the Flatpak is allowed to talk to org.freedesktop.Flatpak` |
+| bundle 經 document portal 傳入（`/run/user/<uid>/doc/<id>/hello.flatpak`），主機端 flatpak 直接讀得到這個路徑 | ✅ 成功 |
+| sandbox 內看不到主機的 `/var/lib/flatpak`（沒給 filesystem 權限） | 確認 |
