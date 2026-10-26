@@ -1,68 +1,76 @@
 # Flatpak File Installer
 
-讓完全不懂 Linux 的人，也能像在 Mac 上一樣安裝 App：在下載好的 `.flatpak` 或 `.flatpakref` 檔案上按兩下（或把檔案拖進視窗），再把 App 拖到「只給我用」或「給這台電腦的所有人」就好。安裝前會用白話說明 App 從哪裡來、可以存取哪些東西；已經裝過的話，會說明版本差在哪裡，讓使用者選擇開啟、更新或替換；缺少的元件（runtime）會自動從 Flathub 下載。
+English | [繁體中文](README.zh-TW.md)
 
-| 準備安裝 | 拖曳中 | 安裝完成 |
+Install apps on Linux the way you would on a Mac, even if you know nothing about Linux. Double-click a downloaded `.flatpak` or `.flatpakref` file (or drag it onto the window), then drag the app onto "Just for me" or "Everyone on this computer". Before installing, it explains in plain words where the app comes from and what it can access. If the app is already installed, it explains how the versions differ and lets you open, update or replace it. Missing components (runtimes) are downloaded from Flathub automatically.
+
+| Ready to install | Dragging | Installed |
 |---|---|---|
-| ![準備安裝](docs/screenshots/ready.png) | ![拖曳中](docs/screenshots/dragging.png) | ![安裝完成](docs/screenshots/installed.png) |
+| ![Ready to install](docs/screenshots/ready.png) | ![Dragging](docs/screenshots/dragging.png) | ![Installed](docs/screenshots/installed.png) |
 
-| 安裝前列出來源與權限 | 已經裝過時 | 把檔案拖進視窗 | SteamOS：自動隱藏「給這台電腦的所有人」 |
+| Source and permissions, before installing | Already installed | Dropping a file onto the window | SteamOS: "Everyone on this computer" is hidden |
 |---|---|---|---|
-| ![安裝前列出來源與權限](docs/screenshots/permissions.png) | ![已經裝過時](docs/screenshots/already-installed.png) | ![把檔案拖進視窗](docs/screenshots/drop-file.png) | ![SteamOS](docs/screenshots/steamos.png) |
+| ![Source and permissions](docs/screenshots/permissions.png) | ![Already installed](docs/screenshots/already-installed.png) | ![Dropping a file onto the window](docs/screenshots/drop-file.png) | ![SteamOS](docs/screenshots/steamos.png) |
 
-> 截圖是在沒有 KDE 桌面主題的虛擬螢幕上拍的；在 Plasma 上會套用系統的外觀。
+> The screenshots show the Traditional Chinese interface. The app uses your system language and falls back to English. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
 
-## 狀態
+## Status
 
-v0.1.0 開發中的骨架。已完成與尚未完成的需求見 [`docs/requirements.md`](docs/requirements.md)。
+v0.1.0, in development. For which requirements are done and which are still open, see [`docs/requirements.md`](docs/requirements.md) (in Traditional Chinese, see [About the documentation](#about-the-documentation)).
 
-- 「只給我用」對應 `flatpak install --user`，「給這台電腦的所有人」對應 `--system`。
-- 發布方式：Flatpak（目標是上架 Flathub）與 AppImage，支援 x86_64 與 aarch64。
-- 以 KDE Plasma、Fedora 44（不可變系統）與 SteamOS 為主要目標。
+- "Just for me" runs `flatpak install --user`; "Everyone on this computer" runs `--system`.
+- Distributed as a Flatpak (aiming for Flathub) and as an AppImage, for x86_64 and aarch64.
+- Mainly targets KDE Plasma, Fedora 44 (immutable) and SteamOS.
 
-## 運作方式
+## About the documentation
+
+This README is available in English and Traditional Chinese. The development documents, [`docs/requirements.md`](docs/requirements.md) and [`spike/README.md`](spike/README.md), are written in Traditional Chinese only. The original author's native language is Chinese, and they work with an AI coding agent in Chinese, so the requirements, design notes and pull request descriptions came out in Chinese.
+
+The code, code comments, commit messages and user interface source strings are all in English.
+
+## How it works
 
 ```
 .flatpak / .flatpakref
-        │  解析檔案（不安裝）：名稱、圖示、版本、需要的 runtime
+        │  read the file (without installing): name, icon, version, required runtime
         ▼
-  PackageFile ──► Installer ──► QML 介面（Kirigami，拖曳安裝）
+  PackageFile ──► Installer ──► QML interface (Kirigami, drag to install)
                      │
-                     │  在主機上執行：
+                     │  runs on the host:
                      │    flatpak --installations
-                     │    flatpak info <runtime>        ← runtime 裝了沒
-                     │    flatpak remotes               ← Flathub 設定了沒
-                     │    flatpak list                  ← 是不是已經裝過
-                     │    flatpak remote-info …         ← .flatpakref 的權限
-                     │      （遠端沒設定時改問 flathub.org/api/v2/summary/…）
-                     │    pkcheck --action-id …         ← 決定要不要顯示「系統」
-                     │    flatpak remote-add flathub …  ← 只在缺 runtime 時
+                     │    flatpak info <runtime>        ← is the runtime installed?
+                     │    flatpak remotes               ← is Flathub set up?
+                     │    flatpak list                  ← is the app already installed?
+                     │    flatpak remote-info …         ← permissions of a .flatpakref
+                     │      (asks flathub.org/api/v2/summary/… when the remote isn't set up)
+                     │    pkcheck --action-id …         ← whether to offer "Everyone on this computer"
+                     │    flatpak remote-add flathub …  ← only when a runtime is missing
                      │    flatpak install --user|--system …
                      ▼
                HostCommand
-                 Flatpak 版：flatpak-spawn --host …
-                 AppImage 版：直接執行，並移除 AppImage 自己的函式庫路徑
+                 Flatpak: flatpak-spawn --host …
+                 AppImage: runs directly, without the AppImage's own library paths
 ```
 
-| 檔案 | 用途 |
+| File | Purpose |
 |---|---|
-| `src/packagefile.*` | 讀取 `.flatpak`（OSTree static delta 格式的 GVariant）與 `.flatpakref`（key file） |
-| `src/hostenvironment.*` | 判斷能不能安裝到系統：主機發行版、polkit 授權結果 |
-| `src/hostcommand.*` | 在主機上執行指令 |
-| `src/flatpakcli.*` | 組出 `flatpak` 指令的參數 |
-| `src/permissions.*` | 從 metadata 整理出 App 的權限與來源 |
-| `src/permissiontext.*` | 把權限與來源寫成白話的翻譯文字 |
-| `src/existinginstall.*` | 找出已安裝的版本，並和檔案裡的版本比較 |
-| `src/flathubclient.*` | 遠端還沒設定時，向 Flathub 網站查詢 `.flatpakref` 的權限 |
-| `src/installer.*` | 給 QML 用的狀態與操作 |
-| `src/filedroparea.*` | 接收從檔案管理員或瀏覽器拖進視窗的檔案 |
-| `src/qml/` | 介面 |
-| `po/` | 翻譯 |
-| `packaging/` | Flatpak manifest 與 AppImage 建置腳本 |
+| `src/packagefile.*` | Reads `.flatpak` (a GVariant in OSTree static delta format) and `.flatpakref` (a key file) |
+| `src/hostenvironment.*` | Decides whether system-wide installs are possible: host distribution, polkit authorization |
+| `src/hostcommand.*` | Runs commands on the host |
+| `src/flatpakcli.*` | Builds the arguments for `flatpak` |
+| `src/permissions.*` | Works out an app's permissions and source from its metadata |
+| `src/permissiontext.*` | Turns permissions and source into plain, translated text |
+| `src/existinginstall.*` | Finds an installed copy and compares it with the one in the file |
+| `src/flathubclient.*` | Asks Flathub's website for a `.flatpakref`'s permissions when its remote isn't set up |
+| `src/installer.*` | State and actions for the QML interface |
+| `src/filedroparea.*` | Accepts files dragged in from a file manager or browser |
+| `src/qml/` | User interface |
+| `po/` | Translations |
+| `packaging/` | Flatpak manifest and AppImage build script |
 
-## 建置
+## Building
 
-需要 Qt 6.8 以上、KDE Frameworks 6.9 以上（Kirigami、KI18n、KCoreAddons、KArchive）、GLib、gettext 與 Extra CMake Modules。Ubuntu 26.04 上的完整套件清單見 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)。
+Requires Qt 6.8 or later, KDE Frameworks 6.9 or later (Kirigami, KI18n, KCoreAddons, KArchive), GLib, gettext and Extra CMake Modules. For the full package list on Ubuntu 26.04, see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ```sh
 cmake -S . -B build -G Ninja
@@ -71,7 +79,7 @@ QT_QPA_PLATFORM=offscreen ctest --test-dir build --output-on-failure
 ./build/bin/flatpak-file-installer path/to/app.flatpak
 ```
 
-`installtest` 會用真正的 `flatpak` 指令，把測試用的 App 裝進暫存目錄；沒有 `flatpak` 或 `busybox` 時會自動略過。
+`installtest` installs test apps into a temporary directory with the real `flatpak` command. It is skipped when `flatpak` or `busybox` isn't available.
 
 ### Flatpak
 
@@ -85,16 +93,16 @@ flatpak-builder --user --install --force-clean build-flatpak packaging/flatpak/i
 packaging/appimage/build-appimage.sh
 ```
 
-## 翻譯
+## Translations
 
-原始字串是英文，翻譯放在 `po/<語言代碼>.po`。
+Source strings are in English; translations live in `po/<language code>.po`.
 
-- 改過介面文字後：執行 `scripts/update-translations.sh`，再更新各語言的 `.po`。CI 會檢查翻譯檔是否跟程式碼同步。
-- 新增語言：把語言代碼（例如 `ja`）加進 `po/LINGUAS`，執行 `scripts/update-translations.sh`，再翻譯產生出來的 `po/ja.po`。
-- `.desktop` 檔和 AppStream metainfo 的翻譯也來自同一份 `.po`。
+- After changing text in the interface, run `scripts/update-translations.sh`, then update each language's `.po` file. CI checks that the translation files match the code.
+- To add a language, add its code (for example `ja`) to `po/LINGUAS`, run `scripts/update-translations.sh`, and translate the new `po/ja.po`.
+- The `.desktop` file and the AppStream metainfo are translated from the same `.po` files.
 
-翻譯原則：讀者是完全不懂 Linux 的人，用日常用語，避免技術術語。
+Guideline: readers know nothing about Linux. Use everyday words and avoid technical terms.
 
-## 授權
+## License
 
-[Apache License 2.0](LICENSE)。AppStream metainfo 以 CC0-1.0 授權。
+[Apache License 2.0](LICENSE). The AppStream metainfo is licensed under CC0-1.0.
