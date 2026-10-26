@@ -2,6 +2,7 @@
 
 # Everything that doesn't need a GUI, so tests can link it.
 add_library(installer_core STATIC
+    flathubclient.cpp
     flatpakcli.cpp
     hostcommand.cpp
     hostenvironment.cpp
@@ -10,7 +11,7 @@ add_library(installer_core STATIC
 )
 target_include_directories(installer_core PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(installer_core
-    PUBLIC Qt6::Core Qt6::Gui
+    PUBLIC Qt6::Core Qt6::Gui Qt6::Network
     PRIVATE KF6::Archive PkgConfig::GLIB
 )
 

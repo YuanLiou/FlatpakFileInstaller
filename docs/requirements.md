@@ -41,6 +41,7 @@
 5. **只能拖曳的無障礙限制**：只用鍵盤或輔助工具的使用者無法完成安裝。這是已確認的產品決定，在此記錄其影響。
 6. **帶有 `runtime-repo` 的 bundle 離線裝不起來**：實測 flatpak 每次安裝這類 bundle 都會去下載 `.flatpakrepo`，即使 runtime 已經裝好也一樣，沒有網路就會失敗。目前的錯誤訊息會請使用者檢查網路連線。
 7. **`--filesystem=xdg-download:ro`**：Flatpak 版多要了「下載」資料夾的唯讀權限，作為拖放時的備援（見 P10）。送審 Flathub 時需要說明理由。
+8. **`--share=network`**：Flatpak 版可以連網，用來向 Flathub 查詢 `.flatpakref` 的權限（見 P4）。送審 Flathub 時需要說明理由。向 Flathub API 查詢的部分只用本機的假伺服器測試過，還沒對真正的 flathub.org 驗證。
 
 ## 判斷能否安裝到系統（P9）
 
@@ -113,7 +114,10 @@ bundle 自帶 `runtime-repo` 時，flatpak 會自己加入那個 repository，�
 **權限**
 
 - `.flatpak`：檔案裡的 metadata 就有。
-- `.flatpakref`：檔案裡沒有。如果它的遠端已經設定在使用者或系統上，用 `flatpak remote-info --show-metadata` 向遠端查詢；查不到就顯示「目前無法得知這個 App 需要哪些權限」。
+- `.flatpakref`：檔案裡沒有，依序這樣查：
+  1. 它的遠端已經設定在使用者或系統上：用 `flatpak remote-info --show-metadata` 向遠端查詢。
+  2. 遠端還沒設定（或查詢失敗），而且是 Flathub 的 App：向 Flathub 網站的 API 查詢，`https://flathub.org/api/v2/summary/<app-id>?branch=<branch>`，把回應的 `metadata.permissions` 轉回 Flatpak metadata 的格式再解析。只接受會用到的 key，D-Bus 名稱也先檢查格式，並交給 GKeyFile 處理跳脫字元，所以回應的內容沒辦法藉此多塞權限。最多等 8 秒。
+  3. 都查不到：顯示「目前無法得知這個 App 需要哪些權限」。
 - 只列出一般人需要知道的權限，用白話描述；GPU、IPC、只讀取其他 App 設定（例如 KDE App 常見的 `xdg-config/kdeglobals:ro`）等不列出。
 - 已經涵蓋的就不重複列：可以存取整台電腦，就不再列個人檔案；可以存取所有個人檔案，就不再列個別資料夾。
 - 較敏感的權限（執行任何程式、存取所有檔案或個人檔案、所有裝置、密碼、金鑰、修改其他 App 的資料、舊式顯示方式等）排在前面，用橘色的小驚嘆號標示，最後加一句「很多好用的 App 都需要這類權限，只要確定你信任這個 App 就好」。不用紅色，也不擋住安裝。

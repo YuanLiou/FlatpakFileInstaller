@@ -13,6 +13,7 @@
 
 #include <functional>
 
+class FlathubClient;
 class QQmlEngine;
 class QJSEngine;
 
@@ -114,12 +115,15 @@ private:
     void checkRuntime();
     void checkRemotes();
     void checkRefMetadata();
+    void checkFlathubMetadata();
+    void finishChecks();
     void updatePermissions();
     void checkAuthorizations(QStringList actions, QList<HostEnvironment::Authorization> results);
     void runInstall(bool forEveryone);
     void failInstall(const Output &output);
 
     State m_state = State::Empty;
+    FlathubClient *m_flathub;
     PackageInfo m_package;
     QVariantList m_permissions;
     QString m_path;

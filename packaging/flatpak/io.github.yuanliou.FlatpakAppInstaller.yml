@@ -21,6 +21,9 @@ finish-args:
   # arrive through the document portal. Browsers' download lists drag plain
   # paths instead, and downloads land here, so allow reading just this folder.
   - --filesystem=xdg-download:ro
+  # For a .flatpakref whose Flathub remote isn't set up yet, the app's
+  # permissions are looked up on flathub.org before installing.
+  - --share=network
 
 cleanup:
   - /include
