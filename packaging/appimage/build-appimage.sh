@@ -27,9 +27,11 @@ TOOLS=$WORK/tools
 APPDIR=$WORK/AppDir
 mkdir -p "$TOOLS"
 
+# Retries for about five minutes: a 504 from GitHub's release downloads can last
+# longer than curl's default backoff, which gives up after half a minute.
 fetch() { # <file> <url>
     if [ ! -x "$TOOLS/$1" ]; then
-        curl -fsSL --retry 5 -o "$TOOLS/$1.part" "$2"
+        curl -fsSL --retry 10 --retry-delay 30 -o "$TOOLS/$1.part" "$2"
         chmod +x "$TOOLS/$1.part"
         mv "$TOOLS/$1.part" "$TOOLS/$1"
     fi
@@ -49,7 +51,7 @@ DESTDIR="$APPDIR" cmake --install "$WORK/build"
 
 fetch_file() { # <file> <url>
     if [ ! -f "$TOOLS/$1" ]; then
-        curl -fsSL --retry 5 -o "$TOOLS/$1.part" "$2"
+        curl -fsSL --retry 10 --retry-delay 30 -o "$TOOLS/$1.part" "$2"
         mv "$TOOLS/$1.part" "$TOOLS/$1"
     fi
 }
