@@ -26,6 +26,8 @@ qt_policy(SET QTP0004 NEW)
 find_package(KF6 ${KF_MIN_VERSION} REQUIRED COMPONENTS I18n CoreAddons Archive)
 # Kirigami is only used from QML, but fail early if it is missing.
 find_package(KF6Kirigami ${KF_MIN_VERSION} REQUIRED)
+# Likewise: the settings page uses Kirigami Addons' FormCard components.
+find_package(KF6KirigamiAddons REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GLIB REQUIRED IMPORTED_TARGET glib-2.0)
 find_package(Gettext REQUIRED)

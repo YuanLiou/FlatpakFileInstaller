@@ -12,6 +12,8 @@
 |---|---|---|---|
 | ![安裝前列出來源與權限](docs/screenshots/zh-TW/permissions.png) | ![已經裝過時](docs/screenshots/zh-TW/already-installed.png) | ![把檔案拖進視窗](docs/screenshots/zh-TW/drop-file.png) | ![SteamOS](docs/screenshots/zh-TW/steamos.png) |
 
+> 介面預設使用系統的語言。可以在設定（視窗右上角的齒輪按鈕，或 KDE 全域選單的「設定」）改選 English 或繁體中文；新的語言在下次啟動時生效，也可以直接請 app 幫你重新啟動。在 KDE Plasma 上，介面也會跟隨你的配色、應用程式風格與圖示主題。
+>
 > 截圖是在沒有 KDE 桌面主題的虛擬螢幕上拍的；在 Plasma 上會套用系統的外觀。
 
 ## 下載
@@ -68,6 +70,8 @@
 | `src/flathubclient.*` | 遠端還沒設定時，向 Flathub 網站查詢 `.flatpakref` 的權限 |
 | `src/icondownloader.*` | 下載 `.flatpakref` 指向的圖示 |
 | `src/installer.*` | 給 QML 用的狀態與操作 |
+| `src/languagepreference.*` | 哪些語言有翻譯、儲存的語言選擇，以及用它重新啟動的方法 |
+| `src/preferences.*` | 設定頁用的資料：語言選擇與重新啟動的提示 |
 | `src/filedroparea.*` | 接收從檔案管理員或瀏覽器拖進視窗的檔案 |
 | `src/qml/` | 介面 |
 | `po/` | 翻譯 |
@@ -75,7 +79,7 @@
 
 ## 建置
 
-需要 Qt 6.8 以上、KDE Frameworks 6.9 以上（Kirigami、KI18n、KCoreAddons、KArchive）、GLib、gettext 與 Extra CMake Modules。Ubuntu 26.04 上的完整套件清單見 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)。
+需要 Qt 6.8 以上、KDE Frameworks 6.9 以上（Kirigami、KI18n、KCoreAddons、KArchive）、Kirigami Addons、GLib、gettext 與 Extra CMake Modules。Ubuntu 26.04 上的完整套件清單見 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)。
 
 ```sh
 cmake -S . -B build -G Ninja

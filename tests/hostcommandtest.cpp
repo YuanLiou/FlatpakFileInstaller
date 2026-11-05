@@ -1,8 +1,12 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "flatpakcli.h"
 #include "hostcommand.h"
+#include "languagepreference.h"
 
+#include <QProcess>
 #include <QTest>
+
+#include <memory>
 
 using namespace Qt::StringLiterals;
 
@@ -11,6 +15,29 @@ class HostCommandTest : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void createGivesLaunchedAppsTheOriginalEnvironment()
+    {
+        qputenv("LANGUAGE", "original");
+        qunsetenv("QT_QPA_PLATFORMTHEME");
+        LanguagePreference::SavedEnvironment saved;
+        saved.remember("LANGUAGE");
+        saved.remember("QT_QPA_PLATFORMTHEME");
+        qputenv("LANGUAGE", "zh_TW:en_US");
+        qputenv("QT_QPA_PLATFORMTHEME", "xdgdesktopportal");
+
+        // Commands we run for ourselves keep what we set...
+        std::unique_ptr<QProcess> install(HostCommand::create(u"flatpak"_s, {}, nullptr));
+        QCOMPARE(install->processEnvironment().value(u"LANGUAGE"_s), u"zh_TW:en_US"_s);
+        QCOMPARE(install->processEnvironment().value(u"QT_QPA_PLATFORMTHEME"_s), u"xdgdesktopportal"_s);
+        // ...an app we launch gets the original values back.
+        std::unique_ptr<QProcess> launch(HostCommand::create(u"flatpak"_s, {}, nullptr, &saved));
+        QCOMPARE(launch->processEnvironment().value(u"LANGUAGE"_s), u"original"_s);
+        QVERIFY(!launch->processEnvironment().contains(u"QT_QPA_PLATFORMTHEME"_s));
+
+        qunsetenv("LANGUAGE");
+        qunsetenv("QT_QPA_PLATFORMTHEME");
+    }
+
     void wrapOutsideFlatpak()
     {
         const auto command = HostCommand::wrap(u"flatpak"_s, {u"--installations"_s}, false);

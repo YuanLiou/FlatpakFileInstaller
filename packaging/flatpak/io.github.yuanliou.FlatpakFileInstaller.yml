@@ -20,6 +20,10 @@ finish-args:
   # Installing apps means running the host's `flatpak` command through
   # `flatpak-spawn --host`; there is no narrower permission for that.
   - --talk-name=org.freedesktop.Flatpak
+  # Not listed here: the KDE runtime's own metadata already grants read access
+  # to ~/.config/kdeglobals and talk access to the global menu service
+  # (com.canonical.AppMenu.Registrar), which is all the KDE look and the
+  # global menu need.
   # Files opened by double-click or dragged from a portal-aware file manager
   # arrive through the document portal. Browsers' download lists drag plain
   # paths instead, and downloads land here, so allow reading just this folder.
@@ -27,6 +31,9 @@ finish-args:
   # For a .flatpakref whose Flathub remote isn't set up yet, the app's
   # permissions are looked up on flathub.org before installing.
   - --share=network
+
+# Kirigami, Kirigami Addons (FormCard, About page) and Qt.labs.platform come
+# with the KDE runtime, so there is no module for them.
 
 cleanup:
   - /include

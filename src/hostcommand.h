@@ -8,6 +8,11 @@
 class QProcess;
 class QObject;
 
+namespace LanguagePreference
+{
+class SavedEnvironment;
+}
+
 // Runs programs on the host system.
 //
 // Inside the Flatpak sandbox this goes through `flatpak-spawn --host`
@@ -31,6 +36,9 @@ Command wrap(const QString &program, const QStringList &arguments, bool inFlatpa
 QProcessEnvironment cleanEnvironment(const QProcessEnvironment &env, const QString &appDir);
 
 // Creates (but does not start) a process that runs `program` on the host.
-QProcess *create(const QString &program, const QStringList &arguments, QObject *parent);
+// With `original`, the variables it remembers get the values they had when
+// we started, so an app we launch doesn't inherit what we set for ourselves
+// (the language, the platform theme).
+QProcess *create(const QString &program, const QStringList &arguments, QObject *parent, const LanguagePreference::SavedEnvironment *original = nullptr);
 
 } // namespace HostCommand
