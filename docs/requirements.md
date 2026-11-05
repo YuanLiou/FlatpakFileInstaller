@@ -25,7 +25,7 @@
 | P13 | 切換語言 | 下次啟動才生效，不做即時切換。選擇後立刻儲存，並用「目標語言」顯示提示（「重新啟動」「稍後再重啟」）；選擇後實際語言和目前相同就不提示 |
 | P14 | 重新啟動 | 按「重新啟動」後，若有開著的檔案（Ready、AlreadyInstalled、Invalid、Failed）會自動開回同一個檔案；Installed 或 Empty 回到首頁 |
 | P15 | 跟隨 KDE 外觀 | 在 KDE 桌面上，App 跟隨使用者的顏色（kdeglobals 配色）、應用程式風格與圖示主題；Flatpak 與 AppImage 都要。使用者選的風格 App 裡沒有時（Oxygen、第三方風格）退回 Breeze，顏色與圖示仍跟隨。Plasma 風格不適用，視窗裝飾由 KWin 負責。新的外觀在下次開啟時反映。非 KDE 桌面（GNOME 等）維持 portal 的 platform theme，不強套 KDE 外觀 |
-| T1 | 發布方式 | 只提供 Flatpak（上架 Flathub）與 AppImage 兩種 |
+| T1 | 發布方式 | 只提供 Flatpak 與 AppImage 兩種，放在 GitHub Releases；Flathub 暫緩（見「已知風險」1） |
 | T2 | CPU 架構 | x86_64 與 aarch64（ARM64） |
 | T3 | 桌面環境 | 專注 KDE Plasma |
 | T4 | 基準平台 | Fedora 44（不可變系統，例如 Kinoite）；另需特別注意 SteamOS（KDE、不可變系統） |
@@ -40,7 +40,7 @@
 
 ## 已知風險
 
-1. **Flathub 審核**：`--talk-name=org.freedesktop.Flatpak` 等於可在主機執行任意指令。Warehouse 有前例，但目前 Flathub 的審核政策尚未確認。
+1. **Flathub 審核**：`--talk-name=org.freedesktop.Flatpak` 等於可在主機執行任意指令。Warehouse 有前例，但目前 Flathub 的審核政策尚未確認。另外，Flathub 的生成式 AI 政策要求揭露 AI 產生的程式碼與文件，Flathub 的 manifest 不可包含 AI 產生或協助的內容，也不可由 AI 開送審 PR 或撰寫說明；審查者可依生成內容的程度直接拒絕。這個專案大部分由 AI 撰寫，所以先只在 GitHub Releases 發布。
 2. **SteamOS 的 system 安裝**：Valve 文件說明預設的 `deck` 帳號**沒有密碼**，因此需要管理員驗證的 system level 安裝很可能無法完成。處理方式見下方「判斷能否安裝到系統」。尚未在實機上驗證。
 3. **AppImage 不會自動成為 `.flatpak` 的預設開啟程式**：需要 app 在第一次執行時協助註冊，或依賴 Gear Lever 等整合工具。
 4. **AppImage 與 FUSE**：舊版 AppImage runtime 需要主機有 libfuse2；應使用新版靜態連結的 type2 runtime。尚未在 Fedora 44 Atomic／SteamOS 上實測。
