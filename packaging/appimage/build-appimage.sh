@@ -76,6 +76,8 @@ export QMAKE="${QMAKE:-$(command -v qmake6 || echo /usr/lib/qt6/bin/qmake)}"
 export QML_SOURCES_PATHS="$ROOT/src/qml:$ROOT/packaging/appimage/qml"
 export EXTRA_QT_MODULES="svg;waylandclient"
 export EXTRA_PLATFORM_PLUGINS="libqwayland.so"
+# Qt's XDG portal platform theme: native file dialogs through the desktop portal.
+export DEPLOY_PLATFORM_THEMES=1
 export OUTPUT="Flatpak_File_Installer-$VERSION-$ARCH.AppImage"
 
 cd "$WORK"

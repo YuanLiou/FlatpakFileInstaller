@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "hostcommand.h"
 
+#include "languagepreference.h"
+
 #include <QFile>
 #include <QProcess>
 
@@ -54,13 +56,17 @@ QProcessEnvironment cleanEnvironment(const QProcessEnvironment &env, const QStri
     return cleaned;
 }
 
-QProcess *create(const QString &program, const QStringList &arguments, QObject *parent)
+QProcess *create(const QString &program, const QStringList &arguments, QObject *parent, const LanguagePreference::SavedEnvironment *original)
 {
     const Command command = wrap(program, arguments, runningInFlatpak());
     auto *process = new QProcess(parent);
     process->setProgram(command.program);
     process->setArguments(command.arguments);
-    process->setProcessEnvironment(cleanEnvironment(QProcessEnvironment::systemEnvironment(), qEnvironmentVariable("APPDIR")));
+    QProcessEnvironment env = cleanEnvironment(QProcessEnvironment::systemEnvironment(), qEnvironmentVariable("APPDIR"));
+    if (original) {
+        original->applyTo(env);
+    }
+    process->setProcessEnvironment(env);
     return process;
 }
 

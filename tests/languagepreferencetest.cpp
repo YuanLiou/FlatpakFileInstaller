@@ -282,6 +282,26 @@ private Q_SLOTS:
         QCOMPARE(saved.names().size(), 2);
     }
 
+    void savedEnvironmentAppliesToAProcessEnvironment()
+    {
+        qputenv("FFI_TEST_SET", "original");
+        qunsetenv("FFI_TEST_UNSET");
+        SavedEnvironment saved;
+        saved.remember("FFI_TEST_SET");
+        saved.remember("FFI_TEST_UNSET");
+
+        QProcessEnvironment env;
+        env.insert(u"FFI_TEST_SET"_s, u"changed"_s);
+        env.insert(u"FFI_TEST_UNSET"_s, u"changed"_s);
+        env.insert(u"OTHER"_s, u"kept"_s);
+        saved.applyTo(env);
+        QCOMPARE(env.value(u"FFI_TEST_SET"_s), u"original"_s);
+        QVERIFY(!env.contains(u"FFI_TEST_UNSET"_s));
+        QCOMPARE(env.value(u"OTHER"_s), u"kept"_s);
+        // Our own process is not touched.
+        QVERIFY(!qEnvironmentVariableIsSet("FFI_TEST_UNSET"));
+    }
+
     void savedEnvironmentKeepsAnEmptyValue()
     {
         qputenv("FFI_TEST_EMPTY", "");

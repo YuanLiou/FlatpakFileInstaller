@@ -3,6 +3,7 @@
 
 #include "existinginstall.h"
 #include "hostenvironment.h"
+#include "languagepreference.h"
 #include "packageinfo.h"
 
 #include <QObject>
@@ -106,6 +107,10 @@ public:
     static Installer *create(QQmlEngine *qmlEngine, QJSEngine *jsEngine);
     static void setInstance(Installer *instance);
 
+    // The environment we started with. Apps we launch get it back, so they
+    // don't inherit the language or platform theme we set for ourselves.
+    void setLaunchEnvironment(const LanguagePreference::SavedEnvironment &environment);
+
     State state() const;
     bool isBusy() const;
     QString appName() const;
@@ -175,6 +180,7 @@ private:
     void finishInstall(const Output &output);
     void failInstall(const Output &output);
 
+    LanguagePreference::SavedEnvironment m_launchEnvironment;
     State m_state = State::Empty;
     FlathubClient *m_flathub;
     IconDownloader *m_icons;

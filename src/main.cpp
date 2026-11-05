@@ -10,6 +10,7 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QDir>
+#include <QFile>
 #include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
@@ -22,7 +23,7 @@ int main(int argc, char *argv[])
     // Remember what the environment looked like, so that restarting to change
     // the language can start again from it.
     Preferences::Startup startup;
-    for (const char *name : {"LANGUAGE", "LC_ALL", "LC_MESSAGES"}) {
+    for (const char *name : {"LANGUAGE", "LC_ALL", "LC_MESSAGES", "QT_QPA_PLATFORMTHEME"}) {
         startup.environment.remember(name);
     }
     startup.environment.remember("XDG_DATA_DIRS");
@@ -35,6 +36,17 @@ int main(int argc, char *argv[])
             dataDirs = "/usr/local/share:/usr/share";
         }
         qputenv("XDG_DATA_DIRS", QByteArray(appDir + "/usr/share:" + dataDirs));
+
+        // Without a platform theme Qt shows its own QML file dialog instead of
+        // the desktop's. The AppImage carries Qt's portal theme, which asks the
+        // desktop (org.freedesktop.portal.FileChooser) and falls back to that
+        // QML dialog when there is no portal. linuxdeploy's hook sets "gtk2" on
+        // GNOME and XFCE, which isn't bundled and so does nothing; replace it.
+        // Any other value is the user's choice and stays.
+        const QByteArray theme = qgetenv("QT_QPA_PLATFORMTHEME");
+        if ((theme.isEmpty() || theme == "gtk2") && QFile::exists(QString::fromUtf8(appDir) + u"/usr/plugins/platformthemes/libqxdgdesktopportal.so"_s)) {
+            qputenv("QT_QPA_PLATFORMTHEME", "xdgdesktopportal");
+        }
     }
 
     // The language chosen in the settings. KI18n, Kirigami and Qt all read
@@ -72,6 +84,7 @@ int main(int argc, char *argv[])
 
     Installer installer(nullptr);
     Installer::setInstance(&installer);
+    installer.setLaunchEnvironment(startup.environment);
 
     startup.arguments = app.arguments();
     startup.files = parser.positionalArguments();

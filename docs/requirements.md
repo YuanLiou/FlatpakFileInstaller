@@ -54,6 +54,8 @@
 13. **主機沒有圖示主題時，Kirigami 與 Kirigami Addons 的圖示會缺**：返回按鈕會變成文字（例如「N…k」），關於頁的「首頁」「回報問題」沒有圖示。在乾淨的 Ubuntu 容器（沒有 breeze）裡看到；裝上 breeze 圖示後返回按鈕正常。KDE Plasma 主機與 Flatpak 的 KDE runtime 都有 breeze，所以只影響沒有圖示主題的環境（例如極精簡的 AppImage 執行環境）。自己的圖示（齒輪等）是內嵌的，不受影響。
 14. **每次開啟設定頁或關於頁，Kirigami 會印出 `PageRow.qml:1000 StackView has detected conflicting anchors`**：改成固定的 `globalToolBar.style`（不用依頁面深度切換）後仍會出現，所以不是我們的綁定造成，是 Kirigami 本身的訊息，不影響功能。
 
+15. **AppImage 的「選擇檔案」依賴桌面的 portal**：AppImage 內打包了 Qt 的 `xdgdesktopportal` platform theme（`libqxdgdesktopportal.so`），檔案選擇走 `org.freedesktop.portal.FileChooser`：Plasma 上是 KDE 的原生視窗，GNOME 上是 GNOME 的。主機沒有 portal 時，Qt 會退回 QtQuick.Dialogs 的 QML 備用視窗（可以用，但外觀不是原生的）。已用假的 portal 實測呼叫與篩選條件；AppImage 已在 KDE Plasma 實機確認，GNOME 尚未實機驗證，Flatpak 內 document portal 回傳的路徑也還沒驗證。使用者自己設定的 `QT_QPA_PLATFORMTHEME`（`gtk2` 以外）會被尊重，這時由使用者的設定決定，而 AppImage 內只有 `xdgdesktopportal` 這個外掛。
+
 ## 判斷能否安裝到系統（P9）
 
 不同的安裝動作對應不同的 polkit 權限，flatpak 預設的規則也不同（`/usr/share/polkit-1/actions/org.freedesktop.Flatpak.policy` 與 `rules.d/org.freedesktop.Flatpak.rules`）：
@@ -129,6 +131,8 @@
 
 **子行程**：解析 `flatpak` 輸出的程式（`--installations`、`list`／`remotes` 的 `--columns`、`remote-info --show-commit`／`--show-metadata`）都不受語言影響，`pkcheck` 只看結束代碼。已在主機上以 `en_US` 和 `zh_TW` 比較過這些指令的輸出，內容相同；只有 `flatpak info` 與錯誤訊息的文字會翻譯，程式只看結束代碼或把它顯示給使用者。所以不需要在啟動子行程時處理。
 
+**啟動使用者的 App 例外**：安裝完成或已安裝時按「開啟」（`Installer::launch`、`Installer::openExisting`）會把 `LANGUAGE`、`LC_ALL`、`LC_MESSAGES`、`QT_QPA_PLATFORMTHEME`（與 `XDG_DATA_DIRS`）還原成啟動時的值（原本沒設定的就移除），否則被開啟的 App 會繼承我們為自己設定的語言與 platform theme（實測 `flatpak run` 會把這些變數原樣帶進 sandbox）。做法是 `HostCommand::create` 多一個可選的 `SavedEnvironment`（`SavedEnvironment::applyTo`），資料與重新啟動用的是同一份，沒有另外維護清單。`flatpak install`／`update` 等指令不還原，所以錯誤訊息仍跟著使用者選的語言。AppImage 的 linuxdeploy hook 在 GNOME／XFCE 設的 `gtk2` 算原始值，還原它就是 AppImage 本來的行為。Flatpak 版不受影響：`flatpak-spawn --host` 不會把 sandbox 內的環境變數轉送到主機（程式沒有傳 `--env`），開啟 App 的指令本來就在主機的環境下執行。
+
 ### 切換與重新啟動
 
 - 選擇語言後立刻儲存。算出「目標語言」（選了某個語言就是它；跟隨系統就是系統語言解析後的結果，沒有翻譯就是 English），和這次執行的語言相同就不提示。
@@ -136,6 +140,14 @@
 - 「重新啟動」用 `execv` 取代目前的行程，不用 `QProcess::startDetached`：Flatpak 的 sandbox 在第一個行程結束時就會消失，document portal 的路徑也只在裡面有效。執行檔用 `/proc/self/exe` 指向的實際檔案（直接執行 `/proc/self/exe` 的話，行程名稱會變成 `exe`）。只有 `Installer` 不在忙碌時才會執行，C++ 這邊也有擋。
 - `exec` 前把 `LANGUAGE`、`LC_ALL`、`LC_MESSAGES` 與 `XDG_DATA_DIRS` 還原成啟動時的值（原本沒設定的就移除）：否則從覆寫改回「跟隨系統」時會繼承舊的語言，AppImage 的 `XDG_DATA_DIRS` 也會一直累積 `$APPDIR/usr/share`。
 - 參數：原本的命令列，拿掉原本的檔案，有開著的檔案就加上 `-- <檔案>`。
+
+### 選擇檔案（原生視窗）
+
+- 「選擇檔案…」（按鈕與 Global Menu）用 QtQuick.Dialogs 的 `FileDialog`，它會透過 Qt 的 platform theme 使用桌面原生的視窗；篩選條件是 `*.flatpak`、`*.flatpakref`，選到檔案後進入安裝畫面。設定頁或關於頁開著時從選單選檔案，會先回到主畫面。
+- **AppImage**：`build-appimage.sh` 設定 `DEPLOY_PLATFORM_THEMES=1`，讓 linuxdeploy-plugin-qt 把 `xdgdesktopportal` platform theme 打包進去（它只依賴已打包的 Qt6 Gui／DBus；CI 的 appimage job 要安裝 `qt6-xdgdesktopportal-platformtheme`）。`main()` 在 `APPDIR` 區塊、`QApplication` 之前，如果 `QT_QPA_PLATFORMTHEME` 沒設定，或是 linuxdeploy 的 hook 在 GNOME／XFCE 設的 `gtk2`（沒有打包，所以沒有作用），就改成 `xdgdesktopportal`；而且只在 AppDir 裡真的有這個外掛時才改。取捨：無法區分 hook 設的 `gtk2` 與使用者自己設的 `gtk2`，但兩者在 AppImage 內都不會有作用，所以一律取代；其他值一律尊重。一般安裝與 Flatpak 不經過這段程式，行為不變。
+- **Flatpak**：不需要改。Qt 在 sandbox 內會自動把 `xdgdesktopportal` 加進 platform theme 清單（實測 `qt.qpa.theme: Adding xdgdesktopportal to list of theme names`，並成功建立），KDE runtime 也有 `libqxdgdesktopportal.so`；實測檔案選擇會呼叫 portal。
+- 沒有 portal 時退回備用視窗（實測）。
+- AppImage 已在 KDE Plasma 實機確認：跳出 KDE 原生視窗、只列出 `.flatpak` 與 `.flatpakref`，選檔後進入安裝畫面，外觀不受影響。安裝完成後按「開啟」，被啟動的 App 用的是系統語言，不受這裡選的語言影響。
 
 ## AppImage 裡 Kirigami Addons 的翻譯
 

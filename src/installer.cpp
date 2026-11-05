@@ -64,6 +64,11 @@ void Installer::setInstance(Installer *instance)
     s_instance = instance;
 }
 
+void Installer::setLaunchEnvironment(const LanguagePreference::SavedEnvironment &environment)
+{
+    m_launchEnvironment = environment;
+}
+
 Installer::State Installer::state() const
 {
     return m_state;
@@ -530,7 +535,7 @@ void Installer::openExisting()
     }
     PackageInfo installed = m_package;
     installed.branch = m_existing->branch;
-    QProcess *process = HostCommand::create(u"flatpak"_s, FlatpakCli::runArguments(installed, m_existing->forEveryone), nullptr);
+    QProcess *process = HostCommand::create(u"flatpak"_s, FlatpakCli::runArguments(installed, m_existing->forEveryone), nullptr, &m_launchEnvironment);
     process->startDetached();
     delete process;
 }
@@ -548,7 +553,7 @@ void Installer::launch()
     if (m_state != State::Installed || !canLaunch()) {
         return;
     }
-    QProcess *process = HostCommand::create(u"flatpak"_s, FlatpakCli::runArguments(m_package, m_installedForEveryone), nullptr);
+    QProcess *process = HostCommand::create(u"flatpak"_s, FlatpakCli::runArguments(m_package, m_installedForEveryone), nullptr, &m_launchEnvironment);
     process->startDetached();
     delete process;
 }

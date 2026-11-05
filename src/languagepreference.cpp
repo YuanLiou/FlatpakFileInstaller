@@ -282,6 +282,18 @@ void SavedEnvironment::restore() const
     }
 }
 
+void SavedEnvironment::applyTo(QProcessEnvironment &env) const
+{
+    for (auto it = m_values.cbegin(); it != m_values.cend(); ++it) {
+        const QString name = QString::fromLatin1(it.key());
+        if (it.value()) {
+            env.insert(name, QString::fromLocal8Bit(*it.value()));
+        } else {
+            env.remove(name);
+        }
+    }
+}
+
 QList<QByteArray> SavedEnvironment::names() const
 {
     return m_values.keys();

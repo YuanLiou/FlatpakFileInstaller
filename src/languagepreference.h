@@ -2,6 +2,7 @@
 #pragma once
 
 #include <QByteArray>
+#include <QProcessEnvironment>
 #include <QHash>
 #include <QSet>
 #include <QSettings>
@@ -94,6 +95,8 @@ public:
     void remember(const QByteArray &name);
     // Puts every remembered variable back; unsets those that weren't set.
     void restore() const;
+    // Sets the remembered values in `env` instead, for a process we start.
+    void applyTo(QProcessEnvironment &env) const;
     QList<QByteArray> names() const;
 
 private:
