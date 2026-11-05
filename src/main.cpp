@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
+#include "hostcommand.h"
 #include "installer.h"
 #include "languagepreference.h"
+#include "platformtheme.h"
 #include "preferences.h"
 
 #include <KAboutData>
@@ -14,6 +16,7 @@
 #include <QIcon>
 #include <QQmlApplicationEngine>
 #include <QQuickStyle>
+#include <QStandardPaths>
 #include <QUrl>
 
 using namespace Qt::StringLiterals;
@@ -23,7 +26,7 @@ int main(int argc, char *argv[])
     // Remember what the environment looked like, so that restarting to change
     // the language can start again from it.
     Preferences::Startup startup;
-    for (const char *name : {"LANGUAGE", "LC_ALL", "LC_MESSAGES", "QT_QPA_PLATFORMTHEME"}) {
+    for (const char *name : {"LANGUAGE", "LC_ALL", "LC_MESSAGES", "QT_QPA_PLATFORMTHEME", "PLASMA_INTEGRATION_USE_PORTAL"}) {
         startup.environment.remember(name);
     }
     startup.environment.remember("XDG_DATA_DIRS");
@@ -36,16 +39,37 @@ int main(int argc, char *argv[])
             dataDirs = "/usr/local/share:/usr/share";
         }
         qputenv("XDG_DATA_DIRS", QByteArray(appDir + "/usr/share:" + dataDirs));
+    }
 
-        // Without a platform theme Qt shows its own QML file dialog instead of
-        // the desktop's. The AppImage carries Qt's portal theme, which asks the
-        // desktop (org.freedesktop.portal.FileChooser) and falls back to that
-        // QML dialog when there is no portal. linuxdeploy's hook sets "gtk2" on
-        // GNOME and XFCE, which isn't bundled and so does nothing; replace it.
-        // Any other value is the user's choice and stays.
-        const QByteArray theme = qgetenv("QT_QPA_PLATFORMTHEME");
-        if ((theme.isEmpty() || theme == "gtk2") && QFile::exists(QString::fromUtf8(appDir) + u"/usr/plugins/platformthemes/libqxdgdesktopportal.so"_s)) {
-            qputenv("QT_QPA_PLATFORMTHEME", "xdgdesktopportal");
+    // Which platform theme to use. Without one Qt shows its own QML file dialog
+    // and no desktop settings. In an AppImage we carry the themes (the portal's,
+    // and Plasma's on KDE); linuxdeploy's hook sets "gtk2" on GNOME and XFCE,
+    // which isn't bundled and so does nothing: that one is replaced. In a Flatpak
+    // on KDE we ask for Plasma's theme (Qt would use the portal's). A value the
+    // user set is theirs.
+    {
+        const QString appDirPath = QString::fromUtf8(qgetenv("APPDIR"));
+        const auto hasPlugin = [&appDirPath](const QByteArray &name) {
+            const QString file = name == "kde" ? u"KDEPlasmaPlatformTheme6.so"_s : u"libqxdgdesktopportal.so"_s;
+            return QFile::exists(appDirPath + u"/usr/plugins/platformthemes/"_s + file);
+        };
+        // In a Flatpak the portal is always there. Otherwise look for the files
+        // a desktop portal installs: asking D-Bus would mean connecting before
+        // QApplication exists.
+        const bool inFlatpak = HostCommand::runningInFlatpak();
+        const bool kdePortalInstalled = !QStandardPaths::locate(QStandardPaths::GenericDataLocation, u"xdg-desktop-portal/portals/kde.portal"_s).isEmpty()
+            && !QStandardPaths::locate(QStandardPaths::GenericDataLocation, u"dbus-1/services/org.freedesktop.portal.Desktop.service"_s).isEmpty();
+        const PlatformTheme::Choice choice = PlatformTheme::choose(qgetenv("QT_QPA_PLATFORMTHEME"),
+                                                                   qEnvironmentVariable("XDG_CURRENT_DESKTOP"),
+                                                                   inFlatpak,
+                                                                   !appDirPath.isEmpty(),
+                                                                   hasPlugin,
+                                                                   inFlatpak || kdePortalInstalled);
+        if (!choice.theme.isEmpty()) {
+            qputenv("QT_QPA_PLATFORMTHEME", choice.theme);
+            if (choice.plasmaUsesPortal && !qEnvironmentVariableIsSet("PLASMA_INTEGRATION_USE_PORTAL")) {
+                qputenv("PLASMA_INTEGRATION_USE_PORTAL", "1");
+            }
         }
     }
 

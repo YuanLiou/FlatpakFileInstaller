@@ -12,7 +12,7 @@ Install apps on Linux the way you would on a Mac, even if you know nothing about
 |---|---|---|---|
 | ![Source and permissions](docs/screenshots/en/permissions.png) | ![Already installed](docs/screenshots/en/already-installed.png) | ![Dropping a file onto the window](docs/screenshots/en/drop-file.png) | ![SteamOS](docs/screenshots/en/steamos.png) |
 
-> The app uses your system language by default. You can pick English or Traditional Chinese in Settings (the gear button at the top right, or Settings in the KDE global menu); the new language is used the next time the app starts, and the app can restart itself for you. The screenshots show the English interface. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
+> The app uses your system language by default. You can pick English or Traditional Chinese in Settings (the gear button at the top right, or Settings in the KDE global menu); the new language is used the next time the app starts, and the app can restart itself for you. On KDE Plasma it also follows your colors, widget style and icon theme. The screenshots show the English interface. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
 
 ## Status
 

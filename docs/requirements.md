@@ -24,6 +24,7 @@
 | P12 | 語言清單 | 「跟隨系統」（預設）、English、繁體中文；清單來自實際有翻譯的語言，新增 `po/<lang>.po` 後不用改程式；語言名稱用該語言自己的寫法 |
 | P13 | 切換語言 | 下次啟動才生效，不做即時切換。選擇後立刻儲存，並用「目標語言」顯示提示（「重新啟動」「稍後再重啟」）；選擇後實際語言和目前相同就不提示 |
 | P14 | 重新啟動 | 按「重新啟動」後，若有開著的檔案（Ready、AlreadyInstalled、Invalid、Failed）會自動開回同一個檔案；Installed 或 Empty 回到首頁 |
+| P15 | 跟隨 KDE 外觀 | 在 KDE 桌面上，App 跟隨使用者的顏色（kdeglobals 配色）、應用程式風格與圖示主題；Flatpak 與 AppImage 都要。使用者選的風格 App 裡沒有時（Oxygen、第三方風格）退回 Breeze，顏色與圖示仍跟隨。Plasma 風格不適用，視窗裝飾由 KWin 負責。新的外觀在下次開啟時反映。非 KDE 桌面（GNOME 等）維持 portal 的 platform theme，不強套 KDE 外觀 |
 | T1 | 發布方式 | 只提供 Flatpak（上架 Flathub）與 AppImage 兩種 |
 | T2 | CPU 架構 | x86_64 與 aarch64（ARM64） |
 | T3 | 桌面環境 | 專注 KDE Plasma |
@@ -47,14 +48,19 @@
 6. **帶有 `runtime-repo` 的 bundle 離線裝不起來**：實測 flatpak 每次安裝這類 bundle 都會去下載 `.flatpakrepo`，即使 runtime 已經裝好也一樣，沒有網路就會失敗。目前的錯誤訊息會請使用者檢查網路連線。
 7. **`--filesystem=xdg-download:ro`**：Flatpak 版多要了「下載」資料夾的唯讀權限，作為拖放時的備援（見 P10）。送審 Flathub 時需要說明理由。
 8. **`--share=network`**：Flatpak 版可以連網，用來向 Flathub 查詢 `.flatpakref` 的權限（見 P4），以及下載 `.flatpakref` 的圖示（見「App 的圖示與名稱」）。送審 Flathub 時需要說明理由。向 Flathub API 查詢的部分只用本機的假伺服器測試過，還沒對真正的 flathub.org 驗證。
-9. **`--talk-name=com.canonical.AppMenu.Registrar`**：Flatpak 版多要了這個 D-Bus 服務的存取權，讓選單可以送到 KDE Plasma 的 Global Menu。已實測（用已安裝的 `org.kde.Platform//6.10` 搭配 `flatpak run --command=sh`）：沒有這個權限時，sandbox 的 bus proxy 把服務藏起來（`NameHasOwner` 回傳 false，呼叫出現 `ServiceUnknown`），app 會判斷沒有 Global Menu；加上之後 `NameHasOwner` 為 true、可以呼叫。沒有這個權限的後果只是看不到選單，齒輪按鈕仍可使用。送審 Flathub 時需要說明理由（許多 KDE App 有同樣的設定）。
+9. **Global Menu 的 `com.canonical.AppMenu.Registrar` 權限來自 KDE runtime**：Flatpak 版的選單要送到 KDE Plasma 的 Global Menu，需要對這個 D-Bus 服務有 talk 權限。manifest 不需要自己加：`org.kde.Platform//6.10` 的 metadata 已含 `[Session Bus Policy] com.canonical.AppMenu.Registrar=talk`（還有 `org.kde.kconfig.notify`、`org.kde.KGlobalSettings`），已實測：拿掉 manifest 裡的 `--talk-name` 重新建置，產出的 App metadata 仍含這一項，在 App 的 sandbox 內（`flatpak run --command=sh <App>`）`NameHasOwner` 為 true，呼叫也到得了（用假的 registrar）。我先前以為需要手動加，是因為用 `flatpak run --command=sh org.kde.Platform//6.10` 直接執行 runtime 來測，那樣不會套用 runtime 的這段 metadata，測試方法有誤。所以送審 Flathub 不必為它辯護，但使用者看到的權限清單仍會有它們。
 10. **語言覆寫需要主機上有可用的 locale**：KI18n 用 gettext，gettext 在 locale 是 `C`（含 `C.UTF-8`）或主機沒有產生該 locale 時，會忽略 `LANGUAGE`。程式在 locale 不可用時，會改用 `<語言>.UTF-8`，再不行用 `en_US.UTF-8`（見「設定與語言」）；如果主機兩者都沒有（AppImage 在極精簡的系統上），選了非英文的語言就不會生效。Flatpak 的 runtime 內建這兩個 locale。
 11. **Kirigami、Kirigami Addons 本身的翻譯**：「關於」頁的固定文字（「授權」「首頁」等）來自 Kirigami Addons 自己的翻譯。Flatpak 版由 runtime 的 `org.kde.Platform.Locale` 提供，而 Flatpak 只會替系統設定的語言安裝它；所以在英文系統上選了繁體中文，關於頁的這些文字可能還是英文。AppImage 版由 `build-appimage.sh` 從同版本的 Kirigami Addons 原始碼編譯出翻譯放進去（Ubuntu 的套件沒有附翻譯）。Kirigami 本身的 Qt 翻譯（`libkirigami6_qt.qm`）沒有打包，AppImage 裡 Kirigami 自己的少數文字會跟隨主機。
 12. **Kirigami Addons 的 AboutPage 會在 console 印出 QML 的 `TypeError`**（`Cannot read property 'width' of null`）：在 Ubuntu 26.04 的 Kirigami Addons 1.11 上，頁面建立時還沒加入視窗，授權對話框的 `parent` 暫時是 null；之後會重新計算，不影響使用。Flatpak 版使用 1.13.1，尚未驗證是否仍會出現。
 13. **主機沒有圖示主題時，Kirigami 與 Kirigami Addons 的圖示會缺**：返回按鈕會變成文字（例如「N…k」），關於頁的「首頁」「回報問題」沒有圖示。在乾淨的 Ubuntu 容器（沒有 breeze）裡看到；裝上 breeze 圖示後返回按鈕正常。KDE Plasma 主機與 Flatpak 的 KDE runtime 都有 breeze，所以只影響沒有圖示主題的環境（例如極精簡的 AppImage 執行環境）。自己的圖示（齒輪等）是內嵌的，不受影響。
 14. **每次開啟設定頁或關於頁，Kirigami 會印出 `PageRow.qml:1000 StackView has detected conflicting anchors`**：改成固定的 `globalToolBar.style`（不用依頁面深度切換）後仍會出現，所以不是我們的綁定造成，是 Kirigami 本身的訊息，不影響功能。
 
-15. **AppImage 的「選擇檔案」依賴桌面的 portal**：AppImage 內打包了 Qt 的 `xdgdesktopportal` platform theme（`libqxdgdesktopportal.so`），檔案選擇走 `org.freedesktop.portal.FileChooser`：Plasma 上是 KDE 的原生視窗，GNOME 上是 GNOME 的。主機沒有 portal 時，Qt 會退回 QtQuick.Dialogs 的 QML 備用視窗（可以用，但外觀不是原生的）。已用假的 portal 實測呼叫與篩選條件；AppImage 已在 KDE Plasma 實機確認，GNOME 尚未實機驗證，Flatpak 內 document portal 回傳的路徑也還沒驗證。使用者自己設定的 `QT_QPA_PLATFORMTHEME`（`gtk2` 以外）會被尊重，這時由使用者的設定決定，而 AppImage 內只有 `xdgdesktopportal` 這個外掛。
+15. **AppImage 的「選擇檔案」依賴桌面的 portal**：AppImage 內打包了 Qt 的 `xdgdesktopportal` platform theme（`libqxdgdesktopportal.so`），檔案選擇走 `org.freedesktop.portal.FileChooser`：Plasma 上是 KDE 的原生視窗，GNOME 上是 GNOME 的。主機沒有 portal 時，Qt 會退回 QtQuick.Dialogs 的 QML 備用視窗（可以用，但外觀不是原生的）。已用假的 portal 實測呼叫與篩選條件；AppImage 已在 KDE Plasma 實機確認，Flatpak 版也已實機確認（含 document portal 回傳的路徑）；GNOME 尚未實機驗證。使用者自己設定的 `QT_QPA_PLATFORMTHEME`（`gtk2` 以外）會被尊重，這時由使用者的設定決定，而 AppImage 內只有 `xdgdesktopportal` 這個外掛。
+
+16. **`xdg-config/kdeglobals:ro` 權限也來自 KDE runtime**：App 讀使用者的顏色、風格與圖示主題設定要讀 `~/.config/kdeglobals`；`org.kde.Platform//6.10` 的 metadata 已含 `[Context] filesystems=xdg-config/kdeglobals:ro`。已實測：manifest 不加這項，建置出的 App metadata 仍含它，在 App 的 sandbox 內看得到該檔案（同上，先前用直接執行 runtime 測「預設看不到」的方法有誤）。不需要在 manifest 另外宣告，Flathub 送審不必為它辯護，使用者看到的權限清單仍會有。圖示主題不需要額外權限：sandbox 的 `XDG_DATA_DIRS` 已包含 `/run/host/share`，主機的 `/usr/share/icons`（例如 Oxygen）在那裡。
+17. **AppImage 變大**：為了跟隨 KDE 外觀，AppImage 多打包 plasma-integration 的 platform theme（`KDEPlasmaPlatformTheme6.so`）與 Breeze 風格（`breeze6.so`），以及它們需要的 KDE Frameworks 函式庫（KIO 等）：從約 64.9 MB（61.9 MiB）增加到約 69.5 MB（66.2 MiB），多約 4.6 MB。linuxdeploy 不打包 `libharfbuzz`，要靠主機提供（原本就如此）。
+18. **AppImage 的 KDE 外觀只在有 KDE portal 時啟用**：plasma-integration 自己的檔案視窗用 KIO，而 KIO 的 file worker 沒有（也不適合）打包，所以要它改走 portal（`PLASMA_INTEGRATION_USE_PORTAL=1`）；但沒有 portal 時這個視窗完全不會出現（實測）。因此只有在偵測到 `xdg-desktop-portal/portals/kde.portal` 與 portal 的 D-Bus 服務檔時才用 Plasma 的 theme，否則退回 xdgdesktopportal theme 與 Qt 的備用視窗。portal 檔案存在但服務壞掉時，檔案視窗仍可能開不起來，這種情況沒有處理。
+19. **Kirigami 自己會讀 kdeglobals**：只要 App 讀得到 `kdeglobals`（Flatpak 版由 runtime 的權限提供，見 16），即使 platform theme 是 portal 的（例如 GNOME），Kirigami 的顏色也會跟著 kdeglobals 走（實測）；風格與圖示不會。GNOME 主機上通常沒有這個檔案，所以實際上看不出來。
 
 ## 判斷能否安裝到系統（P9）
 
@@ -98,11 +104,12 @@
 | P7 多國語言架構 + `zh_TW` | ✅ |
 | P8 只能拖曳 | ✅ |
 | P9 判斷並隱藏「系統」 | ✅ 邏輯與單元測試；尚未在 Fedora 44／SteamOS 實機驗證 |
-| P10 把檔案拖進視窗 | ✅ 在 X11 上實測；Flatpak sandbox 內的 portal 路徑尚未在實機驗證 |
-| P11 設定頁與 Global Menu | ✅ 在 Ubuntu 26.04 容器（Xvfb）實測，包含用假的 `com.canonical.AppMenu.Registrar` 檢查選單內容；AppImage 版已在 KDE Plasma 實機確認 Global Menu 與設定頁，Flatpak 版的 Global Menu 尚未在實機驗證 |
+| P10 把檔案拖進視窗 | ✅ 在 X11 上實測；Flatpak 版已在 KDE Plasma 實機確認（從 Dolphin 拖入「下載」以外的檔案） |
+| P11 設定頁與 Global Menu | ✅ 在 Ubuntu 26.04 容器（Xvfb）實測，包含用假的 `com.canonical.AppMenu.Registrar` 檢查選單內容；AppImage 版已在 KDE Plasma 實機確認 Global Menu 與設定頁，Flatpak 版也已實機確認 Global Menu |
 | P12 語言清單 | ✅ 單元測試；AppImage 內也實測偵測得到翻譯 |
 | P13 切換語言 | ✅ 單元測試與實測（`LANG=C`、`LANG=zh_TW.UTF-8`、`LANG=en_US.UTF-8` 各搭配 English、繁體中文、跟隨系統） |
-| P14 重新啟動 | ✅ 在 Xvfb 實測（一般安裝與 AppImage）；AppImage 版已在 KDE Plasma 實機確認；Flatpak sandbox 內的 `exec` 在容器內實測過，尚未在實機驗證 |
+| P14 重新啟動 | ✅ 在 Xvfb 實測（一般安裝與 AppImage）；AppImage 版已在 KDE Plasma 實機確認；Flatpak 版也已實機確認（語言改變，檔案開回） |
+| P15 跟隨 KDE 外觀 | ✅ 在容器內用自訂配色（橘色、Icons/Theme=oxygen、widgetStyle=Oxygen）、BreezeDark、BreezeLight 實測：Flatpak 與 AppImage 的顏色、圖示（Oxygen）跟隨，風格退回 Breeze；GNOME 維持 portal theme。AppImage 版已在 KDE Plasma 實機確認（Oxygen 圖示、顏色、元件風格、原生檔案視窗、Global Menu）；Flatpak 版也已實機確認 |
 
 ## 設定與語言（P11–P14）
 
@@ -141,10 +148,22 @@
 - `exec` 前把 `LANGUAGE`、`LC_ALL`、`LC_MESSAGES` 與 `XDG_DATA_DIRS` 還原成啟動時的值（原本沒設定的就移除）：否則從覆寫改回「跟隨系統」時會繼承舊的語言，AppImage 的 `XDG_DATA_DIRS` 也會一直累積 `$APPDIR/usr/share`。
 - 參數：原本的命令列，拿掉原本的檔案，有開著的檔案就加上 `-- <檔案>`。
 
+### 跟隨 KDE 外觀（P15）
+
+- 用 plasma-integration 的 platform theme（`kde`）：它讀 `kdeglobals`，提供配色、圖示主題與風格名稱的清單（使用者的風格、`breeze`、`oxygen`、`fusion`、`windows`，依序找第一個存在的）。App 沒有使用者的風格時（例如 Oxygen）自然退回 Breeze；不另外打包 Oxygen 風格。程式沒有自己處理風格。
+- 選擇邏輯在 `src/platformtheme.*`（可測試，`tests/platformthemetest.cpp`），`main()` 在 `QApplication` 之前呼叫：
+  - `QT_QPA_PLATFORMTHEME` 使用者設定了（`gtk2` 在 AppImage 內除外，見上）就不動。
+  - KDE（`XDG_CURRENT_DESKTOP` 含 `KDE`）：Flatpak 與 AppImage 設 `kde`，並設 `PLASMA_INTEGRATION_USE_PORTAL=1`（讓檔案選擇仍走 portal，原因與條件見已知風險 18；原始碼 `kdeplatformtheme.cpp` 查證過：預設用 KIO 的 `KDEPlatformFileDialogHelper`，這個環境變數為 1 時改用 `QXdgDesktopPortalFileDialog`）。
+  - 其他桌面：AppImage 用 `xdgdesktopportal`；Flatpak 不動（Qt 在 sandbox 內自己選 `xdgdesktopportal`）。
+  - Flatpak 必須主動要求 `kde`：實測 KDE 桌面上 Qt 在 sandbox 內仍先選 `xdgdesktopportal`，它只知道淺色／深色，不會跟隨配色、風格、圖示。
+- 新增的環境變數（`PLASMA_INTEGRATION_USE_PORTAL`，與 `QT_QPA_PLATFORMTHEME`）都記在 `SavedEnvironment`：重新啟動時還原，啟動使用者的 App 時也還原（用假的 `flatpak` 實測：`run` 收到的兩者都是未設定，`install` 仍帶著覆寫值）。
+- 打包：`build-appimage.sh` 已用 `DEPLOY_PLATFORM_THEMES=1`，會把 CI 裝的 `plasma-integration` 的 theme 外掛一起打包；`kde-style-breeze` 的 `breeze6.so` 由 linuxdeploy-plugin-qt 打包（`styles/`）。CI 的 appimage job 新增 `plasma-integration kde-style-breeze`。
+- 反映時機：下次開啟。沒有做即時更新，也沒有為此增加權限。
+
 ### 選擇檔案（原生視窗）
 
 - 「選擇檔案…」（按鈕與 Global Menu）用 QtQuick.Dialogs 的 `FileDialog`，它會透過 Qt 的 platform theme 使用桌面原生的視窗；篩選條件是 `*.flatpak`、`*.flatpakref`，選到檔案後進入安裝畫面。設定頁或關於頁開著時從選單選檔案，會先回到主畫面。
-- **AppImage**：`build-appimage.sh` 設定 `DEPLOY_PLATFORM_THEMES=1`，讓 linuxdeploy-plugin-qt 把 `xdgdesktopportal` platform theme 打包進去（它只依賴已打包的 Qt6 Gui／DBus；CI 的 appimage job 要安裝 `qt6-xdgdesktopportal-platformtheme`）。`main()` 在 `APPDIR` 區塊、`QApplication` 之前，如果 `QT_QPA_PLATFORMTHEME` 沒設定，或是 linuxdeploy 的 hook 在 GNOME／XFCE 設的 `gtk2`（沒有打包，所以沒有作用），就改成 `xdgdesktopportal`；而且只在 AppDir 裡真的有這個外掛時才改。取捨：無法區分 hook 設的 `gtk2` 與使用者自己設的 `gtk2`，但兩者在 AppImage 內都不會有作用，所以一律取代；其他值一律尊重。一般安裝與 Flatpak 不經過這段程式，行為不變。
+- **AppImage**：（KDE 上改用 Plasma 的 theme，見上一節；以下是其他桌面與沒有 KDE portal 時的做法。）`build-appimage.sh` 設定 `DEPLOY_PLATFORM_THEMES=1`，讓 linuxdeploy-plugin-qt 把 `xdgdesktopportal` platform theme 打包進去（它只依賴已打包的 Qt6 Gui／DBus；CI 的 appimage job 要安裝 `qt6-xdgdesktopportal-platformtheme`）。`main()` 在 `APPDIR` 區塊、`QApplication` 之前，如果 `QT_QPA_PLATFORMTHEME` 沒設定，或是 linuxdeploy 的 hook 在 GNOME／XFCE 設的 `gtk2`（沒有打包，所以沒有作用），就改成 `xdgdesktopportal`；而且只在 AppDir 裡真的有這個外掛時才改。取捨：無法區分 hook 設的 `gtk2` 與使用者自己設的 `gtk2`，但兩者在 AppImage 內都不會有作用，所以一律取代；其他值一律尊重。一般安裝與 Flatpak 不經過這段程式，行為不變。
 - **Flatpak**：不需要改。Qt 在 sandbox 內會自動把 `xdgdesktopportal` 加進 platform theme 清單（實測 `qt.qpa.theme: Adding xdgdesktopportal to list of theme names`，並成功建立），KDE runtime 也有 `libqxdgdesktopportal.so`；實測檔案選擇會呼叫 portal。
 - 沒有 portal 時退回備用視窗（實測）。
 - AppImage 已在 KDE Plasma 實機確認：跳出 KDE 原生視窗、只列出 `.flatpak` 與 `.flatpakref`，選檔後進入安裝畫面，外觀不受影響。安裝完成後按「開啟」，被啟動的 App 用的是系統語言，不受這裡選的語言影響。

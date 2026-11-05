@@ -12,7 +12,7 @@
 |---|---|---|---|
 | ![安裝前列出來源與權限](docs/screenshots/zh-TW/permissions.png) | ![已經裝過時](docs/screenshots/zh-TW/already-installed.png) | ![把檔案拖進視窗](docs/screenshots/zh-TW/drop-file.png) | ![SteamOS](docs/screenshots/zh-TW/steamos.png) |
 
-> 介面預設使用系統的語言。可以在設定（視窗右上角的齒輪按鈕，或 KDE 全域選單的「設定」）改選 English 或繁體中文；新的語言在下次啟動時生效，也可以直接請 app 幫你重新啟動。
+> 介面預設使用系統的語言。可以在設定（視窗右上角的齒輪按鈕，或 KDE 全域選單的「設定」）改選 English 或繁體中文；新的語言在下次啟動時生效，也可以直接請 app 幫你重新啟動。在 KDE Plasma 上，介面也會跟隨你的配色、應用程式風格與圖示主題。
 >
 > 截圖是在沒有 KDE 桌面主題的虛擬螢幕上拍的；在 Plasma 上會套用系統的外觀。
 

@@ -10,6 +10,7 @@ ecm_add_tests(
     icondownloadertest.cpp
     existinginstalltest.cpp
     languagepreferencetest.cpp
+    platformthemetest.cpp
     LINK_LIBRARIES installer_core Qt6::Test
 )
 

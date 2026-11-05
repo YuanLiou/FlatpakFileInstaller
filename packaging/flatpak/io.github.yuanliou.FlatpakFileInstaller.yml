@@ -20,12 +20,10 @@ finish-args:
   # Installing apps means running the host's `flatpak` command through
   # `flatpak-spawn --host`; there is no narrower permission for that.
   - --talk-name=org.freedesktop.Flatpak
-  # The File, Settings and Help menus go to the desktop's global menu (KDE
-  # Plasma) through this service. Without the permission the sandbox's bus
-  # proxy hides it (tested: NameHasOwner is false and calls fail with
-  # ServiceUnknown), the app finds no global menu, and the menus would be
-  # missing. The settings page is still reachable with the gear button.
-  - --talk-name=com.canonical.AppMenu.Registrar
+  # Not listed here: the KDE runtime's own metadata already grants read access
+  # to ~/.config/kdeglobals and talk access to the global menu service
+  # (com.canonical.AppMenu.Registrar), which is all the KDE look and the
+  # global menu need.
   # Files opened by double-click or dragged from a portal-aware file manager
   # arrive through the document portal. Browsers' download lists drag plain
   # paths instead, and downloads land here, so allow reading just this folder.
