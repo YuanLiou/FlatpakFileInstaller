@@ -97,7 +97,7 @@
 - 最低版本：Qt 6.8、KDE Frameworks 6.9；Flatpak 版使用 KDE runtime 6.10
 - 新增依賴：Kirigami Addons（`KF6KirigamiAddons`；執行時用到 `org.kde.kirigamiaddons.formcard` 與 `org.kde.coreaddons`）、Qt 的 `Qt.labs.platform`（Global Menu）。KDE runtime 6.10 已內建 Kirigami Addons 1.13.1 與 `Qt.labs.platform`，所以 Flatpak manifest 不需要另外的 module
 
-## 實作進度（v1.0.0）
+## 實作進度（v1.0.1）
 
 | 需求 | 狀態 |
 |---|---|

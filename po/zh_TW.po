@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: flatpak-file-installer\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-11-05 03:18+0000\n"
+"POT-Creation-Date: 2026-11-05 22:05+0800\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
@@ -57,6 +57,24 @@ msgid ""
 msgstr ""
 "選「只給我用」就只有你能使用；選「給這台電腦的所有人」，每個使用這台電腦的人"
 "都能開啟。"
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid "A settings page, and a look that fits your desktop."
+msgstr "新增設定頁，外觀也更貼近你的桌面。"
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid "Choose the app's language in the new settings page."
+msgstr "可以在新的設定頁選擇 App 的語言。"
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid ""
+"On KDE Plasma, the app follows your colors, icons and style, and its menus "
+"appear in the global menu."
+msgstr "在 KDE Plasma 上，App 會跟隨你的顏色、圖示和風格，選單也會出現在全域選單裡。"
+
+#: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
+msgid "“Choose File…” opens your desktop's own file picker."
+msgstr "「選擇檔案…」會開啟桌面原本的檔案選擇視窗。"
 
 #: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "The first release."

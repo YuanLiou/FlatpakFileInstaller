@@ -27,7 +27,7 @@
 
 ## 狀態
 
-版本 1.0.0。已完成與尚未完成的需求見 [`docs/requirements.md`](docs/requirements.md)。
+版本 1.0.1。已完成與尚未完成的需求見 [`docs/requirements.md`](docs/requirements.md)。
 
 - 「只給我用」對應 `flatpak install --user`，「給這台電腦的所有人」對應 `--system`。
 - 發布方式：在 GitHub Releases 提供 Flatpak bundle 與 AppImage，支援 x86_64 與 aarch64。推送新的 `v*` tag 時，會自動建置並附加到該版本的 Release。

@@ -117,6 +117,12 @@ jobs:
             qml6-module-qtquick-controls qml6-module-qtquick-layouts qml6-module-qtquick-templates \
             qml6-module-qtquick-window qml6-module-qtquick-dialogs qml6-module-qtqml-workerscript \
             qt6-svg-plugins qt6-xdgdesktopportal-platformtheme plasma-integration kde-style-breeze
+      # The script skips the tools it already has, and GitHub's release
+      # downloads can fail with a 504 for minutes at a time.
+      - uses: actions/cache@v4
+        with:
+          path: build-appimage/tools
+          key: appimage-tools-${{ matrix.arch }}-${{ hashFiles('packaging/appimage/build-appimage.sh') }}
       - name: Build AppImage
         run: sh packaging/appimage/build-appimage.sh build-appimage
       - uses: actions/upload-artifact@v4
