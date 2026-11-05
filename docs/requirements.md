@@ -62,6 +62,11 @@
 18. **AppImage 的 KDE 外觀只在有 KDE portal 時啟用**：plasma-integration 自己的檔案視窗用 KIO，而 KIO 的 file worker 沒有（也不適合）打包，所以要它改走 portal（`PLASMA_INTEGRATION_USE_PORTAL=1`）；但沒有 portal 時這個視窗完全不會出現（實測）。因此只有在偵測到 `xdg-desktop-portal/portals/kde.portal` 與 portal 的 D-Bus 服務檔時才用 Plasma 的 theme，否則退回 xdgdesktopportal theme 與 Qt 的備用視窗。portal 檔案存在但服務壞掉時，檔案視窗仍可能開不起來，這種情況沒有處理。
 19. **Kirigami 自己會讀 kdeglobals**：只要 App 讀得到 `kdeglobals`（Flatpak 版由 runtime 的權限提供，見 16），即使 platform theme 是 portal 的（例如 GNOME），Kirigami 的顏色也會跟著 kdeglobals 走（實測）；風格與圖示不會。GNOME 主機上通常沒有這個檔案，所以實際上看不出來。
 
+20. **Kirigami Addons 的分隔線與下拉選單元件的小問題（上游），我們的因應**：
+    - `FormDelegateSeparator` 沒指定 `above`／`below` 時，500 ms 後才用 `nextItemInFocusChain` 找相鄰項目，會跳過不能取得焦點的 `FormTextDelegate`，綁到更遠、甚至別張卡片的項目，結果滑鼠移到某一列時，別處的線也跟著消失（Ubuntu 的 1.11 與 KDE runtime 的 1.13.1 的 `FormDelegateSeparator.qml` 內容相同，兩者都有）。設定頁自己的分隔線都明確指定相鄰項目。「關於」頁是 Kirigami Addons 的 `FormCard.AboutPage`，裡面有一條沒指定的（`AboutPage.qml` 約 139 行）：頁面建立後（在 500 ms 的計時器之前，用 `Qt.callLater`）走訪子項目，只對 `above` 與 `below` 都沒設定的分隔線，指定為它在佈局中相鄰的可見項目；找不到或上游已修好就什麼都不做。這樣不用複製 `AboutPage`，也不改 runtime。兩個版本都實測過（修之前，滑到「授權」時第一張卡片裡的線會消失）。
+    - `FormComboBoxDelegate` 會把整列變成點擊區（點標籤、說明或周圍空白都會開選單）。語言選項改用 `FormCard.FormCard` 裡的 `QQC2.ComboBox` 加兩個標籤自己組，只有下拉選單本身能開，整列沒有 hover 或按下的高亮；鍵盤（Tab、方向鍵）與 `Accessible.name` 保留。
+    - 以上已在 KDE Plasma 實機（Flatpak 版）確認：hover 時只有相鄰的線隱藏，只有下拉框能打開清單，清單與下拉框同寬。下拉清單的寬度由 `SettingsPage.qml` 自己綁定：KDE runtime 的 `org.kde.desktop` 樣式沒有指定清單寬度，所以清單只有最寬項目那麼寬。
+
 ## 判斷能否安裝到系統（P9）
 
 不同的安裝動作對應不同的 polkit 權限，flatpak 預設的規則也不同（`/usr/share/polkit-1/actions/org.freedesktop.Flatpak.policy` 與 `rules.d/org.freedesktop.Flatpak.rules`）：

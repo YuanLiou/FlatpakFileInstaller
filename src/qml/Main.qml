@@ -208,7 +208,29 @@ Kirigami.ApplicationWindow {
     Component {
         id: aboutPage
         FormCard.AboutPage {
+            id: about
             objectName: "aboutPage"
+
+            // The page has a FormDelegateSeparator that doesn't name its
+            // neighbours (upstream), so it finds them in the focus chain half a
+            // second after the page is made, skips the text delegates, and ends
+            // up hiding a line far away when something is hovered. Name them
+            // here, sooner. Anything that isn't a separator with unset
+            // above/below is left alone, so it does nothing if upstream fixes it.
+            function nameSeparatorNeighbours(item) {
+                for (const child of item.children) {
+                    if (child.above === null && child.below === null && child.parent?.children) {
+                        const siblings = Array.from(child.parent.children).filter(sibling => sibling.visible);
+                        const index = siblings.indexOf(child);
+                        if (index > 0 && index < siblings.length - 1) {
+                            child.above = siblings[index - 1];
+                            child.below = siblings[index + 1];
+                        }
+                    }
+                    nameSeparatorNeighbours(child);
+                }
+            }
+            Component.onCompleted: Qt.callLater(() => nameSeparatorNeighbours(about))
         }
     }
 
