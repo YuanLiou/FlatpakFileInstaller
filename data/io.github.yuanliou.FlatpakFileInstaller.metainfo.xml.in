@@ -40,6 +40,16 @@
   <content_rating type="oars-1.1"/>
 
   <releases>
+    <release version="1.0.1" date="2026-11-05">
+      <description>
+        <p>A settings page, and a look that fits your desktop.</p>
+        <ul>
+          <li>Choose the app's language in the new settings page.</li>
+          <li>On KDE Plasma, the app follows your colors, icons and style, and its menus appear in the global menu.</li>
+          <li>“Choose File…” opens your desktop's own file picker.</li>
+        </ul>
+      </description>
+    </release>
     <release version="1.0.0" date="2026-10-26">
       <description>
         <p>The first release.</p>

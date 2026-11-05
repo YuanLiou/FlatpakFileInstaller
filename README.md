@@ -25,7 +25,7 @@ Get the latest version from the [Releases page](https://github.com/YuanLiou/Flat
 
 ## Status
 
-Version 1.0.0. For which requirements are done and which are still open, see [`docs/requirements.md`](docs/requirements.md) (in Traditional Chinese, see [About the documentation](#about-the-documentation)).
+Version 1.0.1. For which requirements are done and which are still open, see [`docs/requirements.md`](docs/requirements.md) (in Traditional Chinese, see [About the documentation](#about-the-documentation)).
 
 - "Just for me" runs `flatpak install --user`; "Everyone on this computer" runs `--system`.
 - Distributed as a Flatpak bundle and as an AppImage on GitHub Releases, for x86_64 and aarch64. A new `v*` tag builds them and attaches them to its release.
