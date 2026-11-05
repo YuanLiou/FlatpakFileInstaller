@@ -12,7 +12,7 @@ cd "$(dirname "$0")/.."
 DOMAIN=flatpak-file-installer
 POT=po/$DOMAIN.pot
 
-KEYWORDS="--keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 --keyword=i18ncp:1c,2,3"
+KEYWORDS="--keyword=i18n:1 --keyword=i18nc:1c,2 --keyword=i18np:1,2 --keyword=i18ncp:1c,2,3 --keyword=ki18n:1 --keyword=ki18nc:1c,2"
 VERSION=$(sed -n 's/^project(flatpak-file-installer VERSION \([0-9.]*\).*/\1/p' CMakeLists.txt)
 COMMON="--from-code=UTF-8 --add-location=file --package-version=$VERSION --add-comments=TRANSLATORS --sort-by-file --package-name=$DOMAIN --msgid-bugs-address=https://github.com/YuanLiou/FlatpakFileInstaller/issues"
 

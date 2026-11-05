@@ -210,6 +210,24 @@ QString Installer::errorDetails() const
     return m_errorDetails;
 }
 
+QString Installer::restartFile() const
+{
+    switch (m_state) {
+    case State::Ready:
+    case State::AlreadyInstalled:
+    case State::Invalid:
+    case State::Failed:
+        return m_path;
+    case State::Empty:
+    case State::FlatpakMissing:
+    case State::Checking:
+    case State::Installing:
+    case State::Installed:
+        break;
+    }
+    return {};
+}
+
 void Installer::open(const QUrl &file)
 {
     if (isBusy()) {

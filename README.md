@@ -12,7 +12,7 @@ Install apps on Linux the way you would on a Mac, even if you know nothing about
 |---|---|---|---|
 | ![Source and permissions](docs/screenshots/en/permissions.png) | ![Already installed](docs/screenshots/en/already-installed.png) | ![Dropping a file onto the window](docs/screenshots/en/drop-file.png) | ![SteamOS](docs/screenshots/en/steamos.png) |
 
-> The app uses your system language; the screenshots show the English interface. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
+> The app uses your system language by default. You can pick English or Traditional Chinese in Settings (the gear button at the top right, or Settings in the KDE global menu); the new language is used the next time the app starts, and the app can restart itself for you. The screenshots show the English interface. They were taken on a virtual display without a KDE theme; on Plasma the app uses your system's look.
 
 ## Status
 
@@ -65,6 +65,8 @@ The code, code comments, commit messages and user interface source strings are a
 | `src/flathubclient.*` | Asks Flathub's website for a `.flatpakref`'s permissions when its remote isn't set up |
 | `src/icondownloader.*` | Downloads the icon a `.flatpakref` links to |
 | `src/installer.*` | State and actions for the QML interface |
+| `src/languagepreference.*` | Which languages have a translation, the saved language choice, and how to restart with it |
+| `src/preferences.*` | The settings page's model: language choice and the restart prompt |
 | `src/filedroparea.*` | Accepts files dragged in from a file manager or browser |
 | `src/qml/` | User interface |
 | `po/` | Translations |
@@ -72,7 +74,7 @@ The code, code comments, commit messages and user interface source strings are a
 
 ## Building
 
-Requires Qt 6.8 or later, KDE Frameworks 6.9 or later (Kirigami, KI18n, KCoreAddons, KArchive), GLib, gettext and Extra CMake Modules. For the full package list on Ubuntu 26.04, see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+Requires Qt 6.8 or later, KDE Frameworks 6.9 or later (Kirigami, KI18n, KCoreAddons, KArchive), Kirigami Addons, GLib, gettext and Extra CMake Modules. For the full package list on Ubuntu 26.04, see [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
 ```sh
 cmake -S . -B build -G Ninja

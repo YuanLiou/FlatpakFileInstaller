@@ -9,6 +9,7 @@ add_library(installer_core STATIC
     hostcommand.cpp
     hostenvironment.cpp
     icondownloader.cpp
+    languagepreference.cpp
     packagefile.cpp
     permissions.cpp
 )
@@ -28,6 +29,7 @@ qt_add_qml_module(flatpak-file-installer
         qml/AppTile.qml
         qml/DropTarget.qml
         qml/PermissionsCard.qml
+        qml/SettingsPage.qml
     SOURCES
         filedroparea.cpp
         filedroparea.h
@@ -35,6 +37,8 @@ qt_add_qml_module(flatpak-file-installer
         installer.h
         permissiontext.cpp
         permissiontext.h
+        preferences.cpp
+        preferences.h
 )
 
 set_source_files_properties(${PROJECT_SOURCE_DIR}/data/icons/${APP_ID}.svg PROPERTIES QT_RESOURCE_ALIAS app.svg)
@@ -50,6 +54,7 @@ qt_add_resources(flatpak-file-installer icons
         icons/error.svg
         icons/info.svg
         icons/package.svg
+        icons/settings.svg
         icons/user.svg
 )
 

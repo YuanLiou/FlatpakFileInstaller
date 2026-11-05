@@ -3,7 +3,9 @@ import QtQuick
 import QtQuick.Controls as QQC2
 import QtQuick.Dialogs
 import QtQuick.Layouts
+import Qt.labs.platform as Platform
 import org.kde.kirigami as Kirigami
+import org.kde.kirigamiaddons.formcard as FormCard
 import io.github.yuanliou.FlatpakFileInstaller
 
 Kirigami.ApplicationWindow {
@@ -15,14 +17,38 @@ Kirigami.ApplicationWindow {
     minimumWidth: Kirigami.Units.gridUnit * 30
     minimumHeight: Kirigami.Units.gridUnit * 28
 
-    pageStack.globalToolBar.style: Kirigami.ApplicationHeaderStyle.None
+    // The main page has its own gear button. Pages on top of it (settings,
+    // about) get a toolbar with a back button.
+    pageStack.globalToolBar.style: pageStack.layers.depth > 1 ? Kirigami.ApplicationHeaderStyle.ToolBar : Kirigami.ApplicationHeaderStyle.None
     pageStack.initialPage: Kirigami.Page {
-        // A file dragged onto the window opens it, whatever is showing.
-        FileDropArea {
-            id: fileDrop
-            anchors.fill: parent
-            enabled: !Installer.busy
-            onFileDropped: file => Installer.open(file)
+        // Not while installing: leaving would hide what is happening.
+        header: Item {
+            implicitHeight: settingsButton.implicitHeight + Kirigami.Units.smallSpacing
+
+            QQC2.ToolButton {
+                id: settingsButton
+                anchors.right: parent.right
+                anchors.rightMargin: Kirigami.Units.smallSpacing
+                anchors.top: parent.top
+                anchors.topMargin: Kirigami.Units.smallSpacing
+                visible: !Installer.busy
+                // No text: some styles draw it next to the icon whatever
+                // `display` says. The name is for the tooltip and screen readers.
+                display: QQC2.AbstractButton.IconOnly
+                // The icon is a plain black shape, painted in the text color.
+                contentItem: Kirigami.Icon {
+                    source: "qrc:/icons/settings.svg"
+                    isMask: true
+                    color: Kirigami.Theme.textColor
+                    implicitWidth: Kirigami.Units.iconSizes.smallMedium
+                    implicitHeight: Kirigami.Units.iconSizes.smallMedium
+                }
+                Accessible.name: i18n("Settings")
+                QQC2.ToolTip.text: i18n("Settings")
+                QQC2.ToolTip.visible: hovered
+                QQC2.ToolTip.delay: Kirigami.Units.toolTipDelay
+                onClicked: root.openSettings()
+            }
         }
 
         Loader {
@@ -50,21 +76,37 @@ Kirigami.ApplicationWindow {
                 return emptyView;
             }
         }
+    }
 
-        Rectangle {
-            anchors.fill: parent
-            visible: fileDrop.containsDrag
-            radius: Kirigami.Units.cornerRadius
-            color: Kirigami.Theme.backgroundColor
-            border.width: 2
-            border.color: Kirigami.Theme.highlightColor
+    // A file dragged onto the window opens it, whatever is showing, settings
+    // and about included. It sits on the overlay, above those pages.
+    FileDropArea {
+        id: fileDrop
+        parent: QQC2.Overlay.overlay
+        anchors.fill: parent
+        enabled: !Installer.busy
+        onFileDropped: file => {
+            // An invalid file doesn't make the installer busy, so the pages
+            // on top are not cleared by the state change.
+            root.pageStack.layers.clear();
+            Installer.open(file);
+        }
+    }
 
-            Kirigami.PlaceholderMessage {
-                anchors.centerIn: parent
-                width: parent.width - Kirigami.Units.gridUnit * 4
-                icon.source: "qrc:/icons/app.svg"
-                text: i18n("Let go to install this app")
-            }
+    Rectangle {
+        parent: QQC2.Overlay.overlay
+        anchors.fill: parent
+        visible: fileDrop.containsDrag
+        radius: Kirigami.Units.cornerRadius
+        color: Kirigami.Theme.backgroundColor
+        border.width: 2
+        border.color: Kirigami.Theme.highlightColor
+
+        Kirigami.PlaceholderMessage {
+            anchors.centerIn: parent
+            width: parent.width - Kirigami.Units.gridUnit * 4
+            icon.source: "qrc:/icons/app.svg"
+            text: i18n("Let go to install this app")
         }
     }
 
@@ -72,6 +114,132 @@ Kirigami.ApplicationWindow {
         if (Installer.busy) {
             close.accepted = false;
             showPassiveNotification(i18n("Please wait until the installation is finished."));
+        }
+    }
+
+    // Settings and About are pages on top of the main one. Neither can be
+    // opened while installing, and an install can't start from them.
+    function openSettings() {
+        if (Installer.busy || pageStack.layers.currentItem?.objectName === "settingsPage") {
+            return;
+        }
+        // From the about page, go back to the settings underneath it.
+        if (pageStack.layers.depth > 1) {
+            pageStack.layers.pop();
+        }
+        if (pageStack.layers.currentItem?.objectName !== "settingsPage") {
+            pageStack.layers.push(settingsPage);
+        }
+    }
+
+    function openAbout() {
+        if (!Installer.busy && pageStack.layers.currentItem?.objectName !== "aboutPage") {
+            pageStack.layers.push(aboutPage);
+        }
+    }
+
+    function chooseFile() {
+        if (!Installer.busy) {
+            pageStack.layers.clear();
+            fileDialog.open();
+        }
+    }
+
+    Connections {
+        target: Installer
+        function onStateChanged() {
+            if (Installer.busy) {
+                root.pageStack.layers.clear();
+            }
+        }
+    }
+
+    // The menu bar in the global menu (KDE Plasma). Without one, nothing is
+    // shown in the window and the gear button is the way to the settings.
+    Platform.MenuBar {
+        window: root
+
+        Platform.Menu {
+            title: i18nc("Menu bar", "File")
+
+            Platform.MenuItem {
+                text: i18n("Choose File…")
+                shortcut: StandardKey.Open
+                enabled: !Installer.busy
+                onTriggered: root.chooseFile()
+            }
+            Platform.MenuItem {
+                text: i18n("Quit")
+                shortcut: StandardKey.Quit
+                onTriggered: root.close()
+            }
+        }
+
+        Platform.Menu {
+            title: i18nc("Menu bar", "Settings")
+
+            Platform.MenuItem {
+                text: i18n("Settings…")
+                shortcut: "Ctrl+,"
+                enabled: !Installer.busy
+                onTriggered: root.openSettings()
+            }
+        }
+
+        Platform.Menu {
+            title: i18nc("Menu bar", "Help")
+
+            Platform.MenuItem {
+                text: i18n("About")
+                enabled: !Installer.busy
+                onTriggered: root.openAbout()
+            }
+        }
+    }
+
+    Component {
+        id: settingsPage
+        SettingsPage {
+            objectName: "settingsPage"
+            onAboutRequested: root.openAbout()
+        }
+    }
+
+    Component {
+        id: aboutPage
+        FormCard.AboutPage {
+            objectName: "aboutPage"
+        }
+    }
+
+    Kirigami.PromptDialog {
+        id: restartDialog
+        // Written in the language that was chosen; see Preferences.
+        title: Preferences.restartTitle
+        subtitle: Preferences.restartExplanation
+        standardButtons: Kirigami.Dialog.NoButton
+        customFooterActions: [
+            Kirigami.Action {
+                text: Preferences.restartNowText
+                icon.name: "view-refresh"
+                onTriggered: {
+                    restartDialog.close();
+                    if (!Preferences.restart()) {
+                        root.showPassiveNotification(i18n("Couldn't restart the app. Please close it and open it again."));
+                    }
+                }
+            },
+            Kirigami.Action {
+                text: Preferences.restartLaterText
+                onTriggered: restartDialog.close()
+            }
+        ]
+    }
+
+    Connections {
+        target: Preferences
+        function onRestartPrompted() {
+            restartDialog.open();
         }
     }
 

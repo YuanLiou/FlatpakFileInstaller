@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: flatpak-file-installer\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 10:24+0000\n"
+"POT-Creation-Date: 2026-11-05 03:18+0000\n"
 "PO-Revision-Date: 2026-10-26 06:46+0000\n"
 "Last-Translator: \n"
 "Language-Team: Chinese (Taiwan)\n"
@@ -66,7 +66,9 @@ msgstr "第一個正式版本。"
 msgid ""
 "Install “.flatpak” and “.flatpakref” files by dragging the app to “Just for "
 "me” or “Everyone on this computer”."
-msgstr "把 App 拖到「只給我用」或「給這台電腦的所有人」，就能安裝「.flatpak」和「.flatpakref」檔案。"
+msgstr ""
+"把 App 拖到「只給我用」或「給這台電腦的所有人」，就能安裝「.flatpak」和"
+"「.flatpakref」檔案。"
 
 #: data/io.github.yuanliou.FlatpakFileInstaller.metainfo.xml.in
 msgid "See where an app comes from and what it can do before you install it."
@@ -361,9 +363,40 @@ msgctxt "a folder in a list of folders; %1 is its path"
 msgid "“%1”"
 msgstr "「%1」"
 
+#: src/preferences.cpp
+#, kde-format
+msgid "Follow System"
+msgstr "跟隨系統"
+
+#: src/preferences.cpp
+#, kde-format
+msgid "Restart"
+msgstr "重新啟動"
+
+#: src/preferences.cpp
+#, kde-format
+msgid "Restart Later"
+msgstr "稍後再重啟"
+
+#: src/preferences.cpp
+#, kde-format
+msgid "Restart to switch to %1"
+msgstr "需要重新啟動以切換成%1"
+
+#: src/preferences.cpp
+#, kde-format
+msgid ""
+"Your choice is saved. The new language is used the next time you open this "
+"app."
+msgstr "已儲存你的選擇。下次開啟這個 App 時，就會改用新的語言。"
+
 #: src/qml/Main.qml
 msgid "A newer version is available."
 msgstr "有新版本可以更新。"
+
+#: src/qml/Main.qml src/qml/SettingsPage.qml
+msgid "About"
+msgstr "關於"
 
 #: src/qml/Main.qml
 msgid ""
@@ -391,6 +424,10 @@ msgstr "選擇檔案…"
 #: src/qml/Main.qml
 msgid "Close"
 msgstr "關閉"
+
+#: src/qml/Main.qml
+msgid "Couldn't restart the app. Please close it and open it again."
+msgstr "無法重新啟動。請先關閉這個 App，再重新開啟。"
 
 #: src/qml/Main.qml
 msgid "Done"
@@ -423,6 +460,11 @@ msgid ""
 msgstr "每個使用這台電腦的人都能開啟，可能需要輸入你的密碼。"
 
 #: src/qml/Main.qml
+msgctxt "Menu bar"
+msgid "File"
+msgstr "檔案"
+
+#: src/qml/Main.qml
 msgctxt "File dialog filter; keep the parentheses and the patterns unchanged"
 msgid "Flatpak apps (*.flatpak *.flatpakref)"
 msgstr "Flatpak App (*.flatpak *.flatpakref)"
@@ -430,6 +472,11 @@ msgstr "Flatpak App (*.flatpak *.flatpakref)"
 #: src/qml/Main.qml
 msgid "Getting ready…"
 msgstr "準備中…"
+
+#: src/qml/Main.qml
+msgctxt "Menu bar"
+msgid "Help"
+msgstr "說明"
 
 #: src/qml/Main.qml
 msgid "Hide Details"
@@ -494,6 +541,23 @@ msgstr "請檢查網路連線，然後再試一次。"
 #: src/qml/Main.qml
 msgid "Please wait until the installation is finished."
 msgstr "請等安裝完成後再關閉。"
+
+#: src/qml/Main.qml
+msgid "Quit"
+msgstr "結束"
+
+#: src/qml/Main.qml src/qml/SettingsPage.qml
+msgid "Settings"
+msgstr "設定"
+
+#: src/qml/Main.qml
+msgctxt "Menu bar"
+msgid "Settings"
+msgstr "設定"
+
+#: src/qml/Main.qml
+msgid "Settings…"
+msgstr "設定…"
 
 #: src/qml/Main.qml
 msgid "Show Details"
@@ -607,6 +671,30 @@ msgstr "這個 App 不需要特別的權限。"
 #: src/qml/PermissionsCard.qml
 msgid "We couldn't find out what this app can access."
 msgstr "目前無法得知這個 App 需要哪些權限。"
+
+#: src/qml/SettingsPage.qml
+msgid "About Flatpak File Installer"
+msgstr "關於 Flatpak 檔案安裝程式"
+
+#: src/qml/SettingsPage.qml
+msgid "Language"
+msgstr "語言"
+
+#: src/qml/SettingsPage.qml
+msgid "License"
+msgstr "授權"
+
+#: src/qml/SettingsPage.qml
+msgid "Project page"
+msgstr "專案網站"
+
+#: src/qml/SettingsPage.qml
+msgid "Used the next time you open this app."
+msgstr "下次開啟這個 App 時生效。"
+
+#: src/qml/SettingsPage.qml
+msgid "Version"
+msgstr "版本"
 
 #~ msgid "First development version."
 #~ msgstr "第一個開發版本。"

@@ -131,6 +131,9 @@ public:
     Outcome outcome() const;
     QString errorMessage() const;
     QString errorDetails() const;
+    // The file to open again after restarting the app; empty when the
+    // window shows nothing worth coming back to.
+    QString restartFile() const;
 
     Q_INVOKABLE void open(const QUrl &file);
     Q_INVOKABLE void install(bool forEveryone);

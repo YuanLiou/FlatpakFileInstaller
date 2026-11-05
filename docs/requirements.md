@@ -20,10 +20,15 @@
 | P8 | 操作方式 | **只能拖曳**（不提供點選按鈕替代） |
 | P9 | 無法安裝到系統時 | 程式自行判斷；判斷為裝不了時，直接**隱藏**「系統」這個拖放目標，只留「使用者」 |
 | P10 | 把檔案拖進視窗 | 從檔案管理員或瀏覽器把 `.flatpak`／`.flatpakref` 拖到視窗裡，就開啟該檔案的安裝畫面 |
+| P11 | 設定頁 | 視窗右上角有齒輪按鈕，打開設定頁，內容是「語言」與「關於」（版本、授權、專案網站）；KDE 的 Global Menu 也有「檔案」「設定」「說明」。檢查或安裝中（`Installer.busy`）不能進入設定頁。關於頁保留 Kirigami Addons 內建的「使用函式庫」區塊：P2 的白話要求適用於主要使用流程，關於頁是使用者主動進入的內頁，可以完整顯示技術資訊 |
+| P12 | 語言清單 | 「跟隨系統」（預設）、English、繁體中文；清單來自實際有翻譯的語言，新增 `po/<lang>.po` 後不用改程式；語言名稱用該語言自己的寫法 |
+| P13 | 切換語言 | 下次啟動才生效，不做即時切換。選擇後立刻儲存，並用「目標語言」顯示提示（「重新啟動」「稍後再重啟」）；選擇後實際語言和目前相同就不提示 |
+| P14 | 重新啟動 | 按「重新啟動」後，若有開著的檔案（Ready、AlreadyInstalled、Invalid、Failed）會自動開回同一個檔案；Installed 或 Empty 回到首頁 |
 | T1 | 發布方式 | 只提供 Flatpak（上架 Flathub）與 AppImage 兩種 |
 | T2 | CPU 架構 | x86_64 與 aarch64（ARM64） |
 | T3 | 桌面環境 | 專注 KDE Plasma |
 | T4 | 基準平台 | Fedora 44（不可變系統，例如 Kinoite）；另需特別注意 SteamOS（KDE、不可變系統） |
+| T5 | 設定頁的 UI 元件 | 使用 Kirigami Addons（FormCard、AboutPage），外觀接近 KDE 系統設定 |
 
 ## 由需求推導出的技術方向
 
@@ -42,6 +47,12 @@
 6. **帶有 `runtime-repo` 的 bundle 離線裝不起來**：實測 flatpak 每次安裝這類 bundle 都會去下載 `.flatpakrepo`，即使 runtime 已經裝好也一樣，沒有網路就會失敗。目前的錯誤訊息會請使用者檢查網路連線。
 7. **`--filesystem=xdg-download:ro`**：Flatpak 版多要了「下載」資料夾的唯讀權限，作為拖放時的備援（見 P10）。送審 Flathub 時需要說明理由。
 8. **`--share=network`**：Flatpak 版可以連網，用來向 Flathub 查詢 `.flatpakref` 的權限（見 P4），以及下載 `.flatpakref` 的圖示（見「App 的圖示與名稱」）。送審 Flathub 時需要說明理由。向 Flathub API 查詢的部分只用本機的假伺服器測試過，還沒對真正的 flathub.org 驗證。
+9. **`--talk-name=com.canonical.AppMenu.Registrar`**：Flatpak 版多要了這個 D-Bus 服務的存取權，讓選單可以送到 KDE Plasma 的 Global Menu。已實測（用已安裝的 `org.kde.Platform//6.10` 搭配 `flatpak run --command=sh`）：沒有這個權限時，sandbox 的 bus proxy 把服務藏起來（`NameHasOwner` 回傳 false，呼叫出現 `ServiceUnknown`），app 會判斷沒有 Global Menu；加上之後 `NameHasOwner` 為 true、可以呼叫。沒有這個權限的後果只是看不到選單，齒輪按鈕仍可使用。送審 Flathub 時需要說明理由（許多 KDE App 有同樣的設定）。
+10. **語言覆寫需要主機上有可用的 locale**：KI18n 用 gettext，gettext 在 locale 是 `C`（含 `C.UTF-8`）或主機沒有產生該 locale 時，會忽略 `LANGUAGE`。程式在 locale 不可用時，會改用 `<語言>.UTF-8`，再不行用 `en_US.UTF-8`（見「設定與語言」）；如果主機兩者都沒有（AppImage 在極精簡的系統上），選了非英文的語言就不會生效。Flatpak 的 runtime 內建這兩個 locale。
+11. **Kirigami、Kirigami Addons 本身的翻譯**：「關於」頁的固定文字（「授權」「首頁」等）來自 Kirigami Addons 自己的翻譯。Flatpak 版由 runtime 的 `org.kde.Platform.Locale` 提供，而 Flatpak 只會替系統設定的語言安裝它；所以在英文系統上選了繁體中文，關於頁的這些文字可能還是英文。AppImage 版由 `build-appimage.sh` 從同版本的 Kirigami Addons 原始碼編譯出翻譯放進去（Ubuntu 的套件沒有附翻譯）。Kirigami 本身的 Qt 翻譯（`libkirigami6_qt.qm`）沒有打包，AppImage 裡 Kirigami 自己的少數文字會跟隨主機。
+12. **Kirigami Addons 的 AboutPage 會在 console 印出 QML 的 `TypeError`**（`Cannot read property 'width' of null`）：在 Ubuntu 26.04 的 Kirigami Addons 1.11 上，頁面建立時還沒加入視窗，授權對話框的 `parent` 暫時是 null；之後會重新計算，不影響使用。Flatpak 版使用 1.13.1，尚未驗證是否仍會出現。
+13. **主機沒有圖示主題時，Kirigami 與 Kirigami Addons 的圖示會缺**：返回按鈕會變成文字（例如「N…k」），關於頁的「首頁」「回報問題」沒有圖示。在乾淨的 Ubuntu 容器（沒有 breeze）裡看到；裝上 breeze 圖示後返回按鈕正常。KDE Plasma 主機與 Flatpak 的 KDE runtime 都有 breeze，所以只影響沒有圖示主題的環境（例如極精簡的 AppImage 執行環境）。自己的圖示（齒輪等）是內嵌的，不受影響。
+14. **每次開啟設定頁或關於頁，Kirigami 會印出 `PageRow.qml:1000 StackView has detected conflicting anchors`**：改成固定的 `globalToolBar.style`（不用依頁面深度切換）後仍會出現，所以不是我們的綁定造成，是 Kirigami 本身的訊息，不影響功能。
 
 ## 判斷能否安裝到系統（P9）
 
@@ -71,6 +82,7 @@
 - 名稱：Flatpak File Installer（中文：Flatpak 檔案安裝程式）。第一次發布前由 Flatpak App Installer 改名，App ID 與 GitHub repo 名稱一起改，所以不需要 Flathub 的改名遷移。
 - App ID：`io.github.yuanliou.FlatpakFileInstaller`
 - 最低版本：Qt 6.8、KDE Frameworks 6.9；Flatpak 版使用 KDE runtime 6.10
+- 新增依賴：Kirigami Addons（`KF6KirigamiAddons`；執行時用到 `org.kde.kirigamiaddons.formcard` 與 `org.kde.coreaddons`）、Qt 的 `Qt.labs.platform`（Global Menu）。KDE runtime 6.10 已內建 Kirigami Addons 1.13.1 與 `Qt.labs.platform`，所以 Flatpak manifest 不需要另外的 module
 
 ## 實作進度（v1.0.0）
 
@@ -85,6 +97,49 @@
 | P8 只能拖曳 | ✅ |
 | P9 判斷並隱藏「系統」 | ✅ 邏輯與單元測試；尚未在 Fedora 44／SteamOS 實機驗證 |
 | P10 把檔案拖進視窗 | ✅ 在 X11 上實測；Flatpak sandbox 內的 portal 路徑尚未在實機驗證 |
+| P11 設定頁與 Global Menu | ✅ 在 Ubuntu 26.04 容器（Xvfb）實測，包含用假的 `com.canonical.AppMenu.Registrar` 檢查選單內容；AppImage 版已在 KDE Plasma 實機確認 Global Menu 與設定頁，Flatpak 版的 Global Menu 尚未在實機驗證 |
+| P12 語言清單 | ✅ 單元測試；AppImage 內也實測偵測得到翻譯 |
+| P13 切換語言 | ✅ 單元測試與實測（`LANG=C`、`LANG=zh_TW.UTF-8`、`LANG=en_US.UTF-8` 各搭配 English、繁體中文、跟隨系統） |
+| P14 重新啟動 | ✅ 在 Xvfb 實測（一般安裝與 AppImage）；AppImage 版已在 KDE Plasma 實機確認；Flatpak sandbox 內的 `exec` 在容器內實測過，尚未在實機驗證 |
+
+## 設定與語言（P11–P14）
+
+### 入口
+
+- 視窗右上角的齒輪按鈕（`src/icons/settings.svg`）。它放在主畫面上方一條獨立的空白區域，不會蓋住內容；在最小視窗（30×28 gridUnit）的「準備安裝」畫面也確認過。檢查或安裝中隱藏。
+- 設定頁與「關於」頁是疊在主畫面上的頁面（Kirigami 的 layers），上方有返回按鈕。開著設定頁時如果開始檢查或安裝，會自動回到主畫面。選單的「設定…」在關於頁開著時會回到設定頁，不會重複堆疊。
+- **拖放（P10）在設定頁、關於頁開著時照常運作**：接收拖放的 `FileDropArea` 與「放開就可以安裝」的提示放在視窗最上層的 overlay；放開後一律先回到主畫面再開啟檔案（無效的檔案不會進入忙碌狀態，所以明確清除疊著的頁面）。
+- 齒輪圖示是黑色的單色 SVG，用 `Kirigami.Icon` 的 `isMask` 以文字顏色著色，深色主題下也看得到（用 BreezeDark 與 BreezeLight 實測）。
+- **Global Menu**：用 Qt 的 `Qt.labs.platform.MenuBar`。有 Global Menu 的環境（KDE Plasma）才會出現選單，沒有的環境視窗內不會多出選單列，只靠齒輪。選單內容：檔案（選擇檔案…、結束）、設定（設定…）、說明（關於）。`Installer.busy` 時停用「選擇檔案」「設定」「關於」；「結束」走原本的 `onClosing`，安裝中仍不能關閉。從選單選檔案時，如果設定頁開著，會先回到主畫面。
+
+### 語言清單與儲存
+
+- 有翻譯的語言：到 XDG 資料目錄的 `locale/<語言>/LC_MESSAGES/flatpak-file-installer.mo` 找，一律加上 `en`。這和 `KLocalizedString::availableDomainTranslations()` 找的地方相同，但不直接呼叫它：它會讓 Qt 與 KI18n 在那一刻就讀走環境裡的語言，之後再設定 `LANGUAGE` 就來不及了（實測過：選 English 時介面仍是繁體中文）。AppImage 的 `XDG_DATA_DIRS` 在 `main()` 開頭就加上 `$APPDIR/usr/share`，Flatpak 則是 `/app/share`，所以兩者都找得到。
+- 語言名稱用該語言自己的寫法（`QLocale::nativeLanguageName()`）；`en` 特別處理，因為 `QLocale("en")` 會回傳 American English。
+- 設定用 `QSettings`（組織名稱 `yuanliou`、應用程式名稱 `flatpak-file-installer`，明確指定，因為 `QApplication` 建構前就要讀），存在 `~/.config/yuanliou/flatpak-file-installer.conf`，Flatpak 下是 `~/.var/app/<id>/config/yuanliou/…`。鍵是 `language`，沒有值代表跟隨系統。存的語言已經沒有翻譯時，當作跟隨系統。
+- 程式碼：`src/languagepreference.*`（不依賴 GUI，在 `installer_core`，有單元測試 `tests/languagepreferencetest.cpp`）與 `src/preferences.*`（給 QML 用的單例）。
+
+### 怎麼讓整個 app 換語言
+
+在 `QApplication` 建構前設定環境變數，KI18n、Kirigami、Kirigami Addons 與 Qt 都是在啟動時從環境讀語言：
+
+- `LANGUAGE=<語言>:en_US`（選 English 時是 `en_US`）。要寫 `en_US` 而不是 `en`：KI18n 看到 `en_US` 才會停止往下找（`en` 沒有翻譯檔，會繼續用系統的下一個語言）。
+- **`LANG=C` 的情況**：gettext 在 locale 是 `C`（含 `C.UTF-8`）或主機沒有產生該 locale 時，會忽略 `LANGUAGE`（用 `LANG=C LANGUAGE=zh_TW` 實測，連 `toString({"zh_TW"})` 都是英文）。所以這時另外把 `LC_MESSAGES`（若 `LC_ALL` 有設定則是 `LC_ALL`）設成主機上有的 `<語言>.UTF-8`，再不行用 `en_US.UTF-8`。這會被子行程繼承，但 `flatpak` 的輸出有語言影響的部分只有給人看的錯誤訊息（見下）。
+- 「跟隨系統」時，系統語言依 gettext 的規則從環境判斷（`LANGUAGE`，再 `LC_ALL`／`LC_MESSAGES`／`LANG`）；如果 locale 不可用，gettext 會忽略這些，所以視為英文。
+
+**子行程**：解析 `flatpak` 輸出的程式（`--installations`、`list`／`remotes` 的 `--columns`、`remote-info --show-commit`／`--show-metadata`）都不受語言影響，`pkcheck` 只看結束代碼。已在主機上以 `en_US` 和 `zh_TW` 比較過這些指令的輸出，內容相同；只有 `flatpak info` 與錯誤訊息的文字會翻譯，程式只看結束代碼或把它顯示給使用者。所以不需要在啟動子行程時處理。
+
+### 切換與重新啟動
+
+- 選擇語言後立刻儲存。算出「目標語言」（選了某個語言就是它；跟隨系統就是系統語言解析後的結果，沒有翻譯就是 English），和這次執行的語言相同就不提示。
+- 提示的文字與按鈕用目標語言顯示（`ki18n(...).toString(QStringList{語言})`）。「稍後再重啟」只關掉提示。
+- 「重新啟動」用 `execv` 取代目前的行程，不用 `QProcess::startDetached`：Flatpak 的 sandbox 在第一個行程結束時就會消失，document portal 的路徑也只在裡面有效。執行檔用 `/proc/self/exe` 指向的實際檔案（直接執行 `/proc/self/exe` 的話，行程名稱會變成 `exe`）。只有 `Installer` 不在忙碌時才會執行，C++ 這邊也有擋。
+- `exec` 前把 `LANGUAGE`、`LC_ALL`、`LC_MESSAGES` 與 `XDG_DATA_DIRS` 還原成啟動時的值（原本沒設定的就移除）：否則從覆寫改回「跟隨系統」時會繼承舊的語言，AppImage 的 `XDG_DATA_DIRS` 也會一直累積 `$APPDIR/usr/share`。
+- 參數：原本的命令列，拿掉原本的檔案，有開著的檔案就加上 `-- <檔案>`。
+
+## AppImage 裡 Kirigami Addons 的翻譯
+
+Ubuntu 的 Kirigami Addons 套件不含翻譯（`kirigami-addons6.mo`），所以 AppImage 的「關於」頁固定文字會是英文。`packaging/appimage/build-appimage.sh` 會下載版本相同的 Kirigami Addons 原始碼（釘住版本與 SHA-256），把 `po/LINGUAS` 列出的語言編譯成 `kirigami-addons6.mo` 放進 AppDir；上游沒有該語言時印出警告。升級 Ubuntu 的 Kirigami Addons 版本時，要同步更新腳本裡的版本與雜湊。
 
 ## 缺少 runtime 時（P3）
 

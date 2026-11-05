@@ -20,6 +20,12 @@ finish-args:
   # Installing apps means running the host's `flatpak` command through
   # `flatpak-spawn --host`; there is no narrower permission for that.
   - --talk-name=org.freedesktop.Flatpak
+  # The File, Settings and Help menus go to the desktop's global menu (KDE
+  # Plasma) through this service. Without the permission the sandbox's bus
+  # proxy hides it (tested: NameHasOwner is false and calls fail with
+  # ServiceUnknown), the app finds no global menu, and the menus would be
+  # missing. The settings page is still reachable with the gear button.
+  - --talk-name=com.canonical.AppMenu.Registrar
   # Files opened by double-click or dragged from a portal-aware file manager
   # arrive through the document portal. Browsers' download lists drag plain
   # paths instead, and downloads land here, so allow reading just this folder.
@@ -27,6 +33,9 @@ finish-args:
   # For a .flatpakref whose Flathub remote isn't set up yet, the app's
   # permissions are looked up on flathub.org before installing.
   - --share=network
+
+# Kirigami, Kirigami Addons (FormCard, About page) and Qt.labs.platform come
+# with the KDE runtime, so there is no module for them.
 
 cleanup:
   - /include

@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: flatpak-file-installer 1.0.0\n"
 "Report-Msgid-Bugs-To: https://github.com/YuanLiou/FlatpakFileInstaller/"
 "issues\n"
-"POT-Creation-Date: 2026-10-26 10:24+0000\n"
+"POT-Creation-Date: 2026-11-05 04:38+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -353,8 +353,39 @@ msgctxt "a folder in a list of folders; %1 is its path"
 msgid "“%1”"
 msgstr ""
 
+#: src/preferences.cpp
+#, kde-format
+msgid "Follow System"
+msgstr ""
+
+#: src/preferences.cpp
+#, kde-format
+msgid "Restart"
+msgstr ""
+
+#: src/preferences.cpp
+#, kde-format
+msgid "Restart Later"
+msgstr ""
+
+#: src/preferences.cpp
+#, kde-format
+msgid "Restart to switch to %1"
+msgstr ""
+
+#: src/preferences.cpp
+#, kde-format
+msgid ""
+"Your choice is saved. The new language is used the next time you open this "
+"app."
+msgstr ""
+
 #: src/qml/Main.qml
 msgid "A newer version is available."
+msgstr ""
+
+#: src/qml/Main.qml src/qml/SettingsPage.qml
+msgid "About"
 msgstr ""
 
 #: src/qml/Main.qml
@@ -381,6 +412,10 @@ msgstr ""
 
 #: src/qml/Main.qml
 msgid "Close"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Couldn't restart the app. Please close it and open it again."
 msgstr ""
 
 #: src/qml/Main.qml
@@ -412,12 +447,22 @@ msgid ""
 msgstr ""
 
 #: src/qml/Main.qml
+msgctxt "Menu bar"
+msgid "File"
+msgstr ""
+
+#: src/qml/Main.qml
 msgctxt "File dialog filter; keep the parentheses and the patterns unchanged"
 msgid "Flatpak apps (*.flatpak *.flatpakref)"
 msgstr ""
 
 #: src/qml/Main.qml
 msgid "Getting ready…"
+msgstr ""
+
+#: src/qml/Main.qml
+msgctxt "Menu bar"
+msgid "Help"
 msgstr ""
 
 #: src/qml/Main.qml
@@ -482,6 +527,23 @@ msgstr ""
 
 #: src/qml/Main.qml
 msgid "Please wait until the installation is finished."
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Quit"
+msgstr ""
+
+#: src/qml/Main.qml src/qml/SettingsPage.qml
+msgid "Settings"
+msgstr ""
+
+#: src/qml/Main.qml
+msgctxt "Menu bar"
+msgid "Settings"
+msgstr ""
+
+#: src/qml/Main.qml
+msgid "Settings…"
 msgstr ""
 
 #: src/qml/Main.qml
@@ -593,4 +655,28 @@ msgstr ""
 
 #: src/qml/PermissionsCard.qml
 msgid "We couldn't find out what this app can access."
+msgstr ""
+
+#: src/qml/SettingsPage.qml
+msgid "About Flatpak File Installer"
+msgstr ""
+
+#: src/qml/SettingsPage.qml
+msgid "Language"
+msgstr ""
+
+#: src/qml/SettingsPage.qml
+msgid "License"
+msgstr ""
+
+#: src/qml/SettingsPage.qml
+msgid "Project page"
+msgstr ""
+
+#: src/qml/SettingsPage.qml
+msgid "Used the next time you open this app."
+msgstr ""
+
+#: src/qml/SettingsPage.qml
+msgid "Version"
 msgstr ""
